@@ -13,6 +13,7 @@
 		E2169CE01DF4B36C00284F29 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */; };
 		E2169CE91DF7404700284F29 /* send100.png in Resources */ = {isa = PBXBuildFile; fileRef = E2169CE81DF7404700284F29 /* send100.png */; };
 		E2169CEB1DF7416200284F29 /* read100.png in Resources */ = {isa = PBXBuildFile; fileRef = E2169CEA1DF7416200284F29 /* read100.png */; };
+		E2169CEE1DF75FC000284F29 /* ObserversObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = E2169CED1DF75FC000284F29 /* ObserversObjC.mm */; };
 		E26248D51DEC88DD00076DD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D41DEC88DD00076DD1 /* AppDelegate.swift */; };
 		E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D61DEC88DD00076DD1 /* ViewController.swift */; };
 		E26248DA1DEC88DD00076DD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26248D81DEC88DD00076DD1 /* Main.storyboard */; };
@@ -32,6 +33,8 @@
 		E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E2169CE81DF7404700284F29 /* send100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = send100.png; path = ../../../Downloads/send100.png; sourceTree = "<group>"; };
 		E2169CEA1DF7416200284F29 /* read100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = read100.png; path = ../../../Downloads/read100.png; sourceTree = "<group>"; };
+		E2169CEC1DF75FC000284F29 /* ObserversObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObserversObjC.h; sourceTree = "<group>"; };
+		E2169CED1DF75FC000284F29 /* ObserversObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObserversObjC.mm; sourceTree = "<group>"; };
 		E26248D11DEC88DD00076DD1 /* IMessenger_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IMessenger_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26248D41DEC88DD00076DD1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26248D61DEC88DD00076DD1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -153,6 +156,8 @@
 				E2B977701DED6020001551BC /* TypesObjC.mm */,
 				E2AA44D91DEDCB00004BAC9B /* SettingsObjC.h */,
 				E2AA44DA1DEDCB00004BAC9B /* SettingsObjC.mm */,
+				E2169CEC1DF75FC000284F29 /* ObserversObjC.h */,
+				E2169CED1DF75FC000284F29 /* ObserversObjC.mm */,
 			);
 			name = ObjC;
 			sourceTree = "<group>";
@@ -236,6 +241,7 @@
 				E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */,
 				E26248F51DEC8E6A00076DD1 /* MessengerObjC.mm in Sources */,
 				E2169CDE1DF4B15800284F29 /* ChatViewController.swift in Sources */,
+				E2169CEE1DF75FC000284F29 /* ObserversObjC.mm in Sources */,
 				E2169CE01DF4B36C00284F29 /* ChatTableViewCell.swift in Sources */,
 				E2169CDC1DF4415900284F29 /* ActiveUserTableViewCell.swift in Sources */,
 				E2B977711DED6020001551BC /* TypesObjC.mm in Sources */,

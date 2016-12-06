@@ -31,6 +31,7 @@ public:
 class RequestUsersCallbackObjC : public messenger::IRequestUsersCallback
 {
 public:
+    
     virtual void OnOperationResult(messenger::operation_result::Type result, const messenger::UserList& users) override {
         if (m_handler) {
             m_handler(result,users);
@@ -41,22 +42,25 @@ public:
 };
 
 
+
+
 class MessagesObserverObjC : public messenger::IMessagesObserver
 {
 public:
-    virtual void OnMessageStatusChanged(const MessageId& msgId, messenger::message_status::Type status)  {
+    
+    virtual void OnMessageStatusChanged(const messenger::MessageId& msgId, messenger::message_status::Type status) override {
         if(m_handlerMessageStatusChanged){
             m_handlerMessageStatusChanged(msgId,status);
         }
     }
-    virtual void OnMessageReceived(const UserId& senderId, const Message& msg) {
+    virtual void OnMessageReceived(const messenger::UserId& senderId, const messenger::Message& msg) override  {
         if(m_handlerMessageReceived){
             m_handlerMessageReceived(senderId,msg);
         }
     }
     
-    void (^m_handlerMessageStatusChanged)(const MessageId&, messenger::message_status::Type) = 0;
-    void (^m_handlerMessageReceived)(const UserId&, const Message&) = 0;
+    void (^m_handlerMessageStatusChanged)(const messenger::MessageId&, messenger::message_status::Type) = 0;
+    void (^m_handlerMessageReceived)(const messenger::UserId&, const messenger::Message&) = 0;
 };
 
 
@@ -66,10 +70,11 @@ public:
     std::shared_ptr<messenger::IMessenger>   m_IMessenger;
     LoginCallbackObjC                        m_LoginCallback;
     RequestUsersCallbackObjC                 m_RequestLoginCallback;
-    std::shared_ptr<MessagesObserverObjC>    m_MessageObserver;
+    MessagesObserverObjC                     m_MessageObserver;
 }
 @property(assign) BOOL isConnecting;
 @property(assign) operationResult connectionStatus;
+
 
 @end
 
@@ -192,6 +197,69 @@ public:
 
 -(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID {
     m_IMessenger->SendMessageSeen(std::string([userID UTF8String]), std::string([messageID UTF8String]));
+}
+
+-(void)registerObserverWithCompletionBlock:(void(^)(UserId,Message*, messageStatus))completionBlock  {
+    m_MessageObserver.m_handlerMessageReceived = ^(const messenger::UserId& userID, const messenger::Message& message){
+        
+        Message* tmpMessage = [[Message alloc]init];
+        tmpMessage.identifier = [NSString stringWithCString:message.identifier.c_str()
+                                                        encoding:[NSString defaultCStringEncoding]];
+        tmpMessage.date = [NSDate dateWithTimeIntervalSince1970:message.time];
+        
+        MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
+        tmpContent.encrypted = message.content.encrypted;
+        switch (message.content.type) {
+            case messenger::message_content_type::Text:
+                tmpContent.type = Text;
+                break;
+            case messenger::message_content_type::Image:
+                tmpContent.type = Image;
+                break;
+            case messenger::message_content_type::Video:
+                tmpContent.type = Video;
+                break;
+            default:
+                break;
+        }
+        NSMutableString* tmpString = [[NSMutableString alloc]init];
+        for(char const& value: message.content.data) {
+            [tmpString appendFormat:@"%c", value];
+        }
+        tmpContent.data = tmpString;
+        tmpMessage.content = tmpContent;
+
+        completionBlock([NSString stringWithCString:userID.c_str()
+                                           encoding:[NSString defaultCStringEncoding]],tmpMessage,FailedToSend);
+    };
+    
+    m_MessageObserver.m_handlerMessageStatusChanged = ^(const messenger::MessageId& messageID, messenger::message_status::Type messageStatus){
+        enum messageStatus tmpStatus;
+        switch (messageStatus) {
+            case messenger::message_status::Type::Sending:
+                tmpStatus = Sending;
+                break;
+            case messenger::message_status::Type::Sent:
+                tmpStatus = Sent;
+                break;
+            case messenger::message_status::Type::FailedToSend:
+                tmpStatus = FailedToSend;
+                break;
+            case messenger::message_status::Type::Delivered:
+                tmpStatus = Delivered;
+                break;
+            case messenger::message_status::Type::Seen:
+                tmpStatus = Seen;
+                break;
+            default:
+                break;
+        }
+        Message* tmpMessage = [[Message alloc]init];
+        tmpMessage.identifier = [NSString stringWithCString:messageID.c_str()
+                                                   encoding:[NSString defaultCStringEncoding]];
+        completionBlock(nil,tmpMessage,tmpStatus);
+    };
+    m_IMessenger->RegisterObserver(&m_MessageObserver);
 }
 
 @end

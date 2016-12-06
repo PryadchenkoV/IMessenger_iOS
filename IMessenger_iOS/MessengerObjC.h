@@ -21,5 +21,7 @@
 -(void)requestActiveUsersWithEndBlock:(void(^)(operationResult,NSMutableArray*))completionBlock;
 -(Message*)sendMessageToUser:(NSString*)user messageContent:(MessageContentObjC*)message;
 -(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID;
+-(void)registerObserverWithCompletionBlock:(void(^)(UserId,Message*, messageStatus))completionBlock;
+
 
 @end

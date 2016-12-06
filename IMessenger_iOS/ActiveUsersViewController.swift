@@ -16,6 +16,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var barButtonDisconnect: UIBarButtonItem!
     
+    @IBOutlet weak var barButtonRefresh: UIBarButtonItem!
     var userName = ""
     var arrayOfUsers = [String]()
     
@@ -39,12 +40,16 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             default:
                 print("Default")
             }
-
+            
         }
         arrayOfUsers.sort()
+        getActivityUsers()
         
     }
 
+    func getActivityUsers(){
+        
+    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return arrayOfUsers.count
@@ -67,6 +72,28 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
         switch sender{
         case barButtonDisconnect:
             messengerInstance.disconnectFromServer()
+        case barButtonRefresh:
+            arrayOfUsers.removeAll()
+            messengerInstance.requestActiveUsers { (operationResult, NSMutableArray) in
+                switch operationResult {
+                case Ok:
+                    for user in NSMutableArray! {
+                        let userObj = user as! UserObjC
+                        self.arrayOfUsers.append(userObj.userId)
+                    }
+                    DispatchQueue.main.async {
+                        self.tableViewActiveUsers.reloadData()
+                    }
+                case AuthError:
+                    print("AuthError")
+                case InternalError:
+                    print("InternalError")
+                case NetworkError:
+                    print("NetworkError")
+                default:
+                    print("Default")
+                }
+            }
         default:
             break
         }

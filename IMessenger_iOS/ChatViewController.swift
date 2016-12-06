@@ -27,6 +27,21 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = nameOfUser
+        messengerInstance.registerObserver { (String, Message, messageStatus) in
+            if let userID = String {
+                if userID == self.nameOfUser {
+                    self.flagFromWhom = 1
+                    self.messengesArray = [(Message?.content.data)!] + self.messengesArray
+                    DispatchQueue.main.async {
+                        self.tableViewChat.beginUpdates()
+                        self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .right)
+                        self.tableViewChat.endUpdates()
+                    }
+                }
+            } else {
+                
+            }
+        }
         textFieldChat.delegate = self
         tableViewChat.delegate = self
         tableViewChat.dataSource = self
@@ -92,7 +107,6 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         self.tableViewChat.beginUpdates()
         self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
         self.tableViewChat.endUpdates()
-        print(messengesArray)
         messengerInstance.sentMessageSeen(withId: messengeSend?.identifier, fromUser: nameOfUser)
         
         

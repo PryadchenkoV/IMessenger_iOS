@@ -7,6 +7,7 @@
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -104,7 +105,7 @@
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="9NE-hF-w2g" id="ZUu-34-cGc">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g58-Aw-Bka">
@@ -138,15 +139,23 @@
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Online Users" id="Bx4-BZ-r7Y">
-                        <barButtonItem key="rightBarButtonItem" title="Disconnect" id="zvt-oD-N1Y">
-                            <connections>
-                                <action selector="barButtonPushed:" destination="Fdc-YS-wMk" id="nN5-xa-f4p"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="refresh" id="cdv-3a-PMk">
+                                <connections>
+                                    <action selector="barButtonPushed:" destination="Fdc-YS-wMk" id="cDO-w5-2o9"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Disc." systemItem="stop" id="zvt-oD-N1Y">
+                                <connections>
+                                    <action selector="barButtonPushed:" destination="Fdc-YS-wMk" id="nN5-xa-f4p"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="barButtonDisconnect" destination="zvt-oD-N1Y" id="zSp-oC-f4k"/>
+                        <outlet property="barButtonRefresh" destination="cdv-3a-PMk" id="BZH-Lt-WQ2"/>
                         <outlet property="tableViewActiveUsers" destination="SEj-G1-dbD" id="wyf-qR-VP4"/>
                         <segue destination="uTu-Yv-EWf" kind="show" identifier="fromActiveUsersToChat" id="ahz-55-bzg"/>
                     </connections>
