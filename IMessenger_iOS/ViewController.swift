@@ -9,6 +9,8 @@
 import UIKit
 
 let kSegueFromLoginToActiveUsers = "fromLoginToActiveUsers"
+let messengerInstance = MessengerObjC()
+
 
 class ViewController: UIViewController {
 
@@ -26,7 +28,6 @@ class ViewController: UIViewController {
     }
 
     @IBAction func buttonLoginPushed(_ sender: UIButton) {
-        let messengerInstance = MessengerObjC()
         messengerInstance.login(withUserId: lableLogin.text, password: lablePassword.text) { (result) in
             switch result {
             case Ok:

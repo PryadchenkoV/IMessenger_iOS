@@ -88,7 +88,9 @@ typedef NSString* UserId;
 @property UserId userId;
 @property SecurityPolicyObjC* securityPolicy;
 
+- (instancetype)init;
+
 @end
 
-typedef NSMutableArray* UserList;
+typedef NSMutableArray* UserListObjC;
 

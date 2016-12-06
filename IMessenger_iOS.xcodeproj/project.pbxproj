@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		E2169CDA1DF43EE600284F29 /* ActiveUsersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */; };
 		E2169CDC1DF4415900284F29 /* ActiveUserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */; };
+		E2169CDE1DF4B15800284F29 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDD1DF4B15800284F29 /* ChatViewController.swift */; };
+		E2169CE01DF4B36C00284F29 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */; };
 		E26248D51DEC88DD00076DD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D41DEC88DD00076DD1 /* AppDelegate.swift */; };
 		E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D61DEC88DD00076DD1 /* ViewController.swift */; };
 		E26248DA1DEC88DD00076DD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26248D81DEC88DD00076DD1 /* Main.storyboard */; };
@@ -24,6 +26,8 @@
 /* Begin PBXFileReference section */
 		E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveUsersViewController.swift; sourceTree = "<group>"; };
 		E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveUserTableViewCell.swift; sourceTree = "<group>"; };
+		E2169CDD1DF4B15800284F29 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		E26248D11DEC88DD00076DD1 /* IMessenger_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IMessenger_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26248D41DEC88DD00076DD1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26248D61DEC88DD00076DD1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -84,6 +88,8 @@
 				E26248D41DEC88DD00076DD1 /* AppDelegate.swift */,
 				E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */,
 				E26248D61DEC88DD00076DD1 /* ViewController.swift */,
+				E2169CDD1DF4B15800284F29 /* ChatViewController.swift */,
+				E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */,
 				E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */,
 				E26248D81DEC88DD00076DD1 /* Main.storyboard */,
 				E26248DB1DEC88DD00076DD1 /* Assets.xcassets */,
@@ -213,6 +219,8 @@
 			files = (
 				E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */,
 				E26248F51DEC8E6A00076DD1 /* MessengerObjC.mm in Sources */,
+				E2169CDE1DF4B15800284F29 /* ChatViewController.swift in Sources */,
+				E2169CE01DF4B36C00284F29 /* ChatTableViewCell.swift in Sources */,
 				E2169CDC1DF4415900284F29 /* ActiveUserTableViewCell.swift in Sources */,
 				E2B977711DED6020001551BC /* TypesObjC.mm in Sources */,
 				E26248D51DEC88DD00076DD1 /* AppDelegate.swift in Sources */,

@@ -16,6 +16,8 @@
 @property(nonatomic,strong)NSString* userId;
 @property(nonatomic,strong)NSString* password;
 
--(void)loginWithUserId:(UserId)userId password:(NSString*)password complitionBlock:(void(^)(operationResult))complitionBlock;
+-(void)loginWithUserId:(UserId)userId password:(NSString*)password completionBlock:(void(^)(operationResult))completionBlock;
+-(void)disconnectFromServer;
+-(void)requestActiveUsersWithEndBlock:(void(^)(operationResult,NSMutableArray*))completionBlock;
 
 @end

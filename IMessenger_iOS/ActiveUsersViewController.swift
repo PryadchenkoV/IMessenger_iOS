@@ -14,28 +14,55 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
 
     @IBOutlet weak var tableViewActiveUsers: UITableView!
     
+    @IBOutlet weak var barButtonDisconnect: UIBarButtonItem!
+    
+    var arrayOfUsers = [String]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableViewActiveUsers.delegate = self
         tableViewActiveUsers.dataSource = self
+        messengerInstance.requestActiveUsers { (operationResult, NSMutableArray) in
+            switch operationResult {
+            case Ok:
+                for user in NSMutableArray! {
+                    let userObj = user as! UserObjC
+                    self.arrayOfUsers.append(userObj.userId)
+                }
+            case AuthError:
+                print("AuthError")
+            case InternalError:
+                print("InternalError")
+            case NetworkError:
+                print("NetworkError")
+            default:
+                print("Default")
+            }
+
+        }
         
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 0
+        return arrayOfUsers.count
     }
     
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cellActiveUsers = tableView.dequeueReusableCell(withIdentifier: kCellActiveUserReusedID) as! ActiveUserTableViewCell
+        cellActiveUsers.lableNameOfUser.text = arrayOfUsers[indexPath.row]
         return cellActiveUsers
     }
-    
+
+    @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
+        switch sender{
+        case barButtonDisconnect:
+            messengerInstance.disconnectFromServer()
+        default:
+            break
+        }
+    }
 
     /*
     // MARK: - Navigation
