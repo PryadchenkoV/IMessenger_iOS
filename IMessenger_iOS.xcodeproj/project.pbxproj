@@ -11,6 +11,8 @@
 		E2169CDC1DF4415900284F29 /* ActiveUserTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */; };
 		E2169CDE1DF4B15800284F29 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDD1DF4B15800284F29 /* ChatViewController.swift */; };
 		E2169CE01DF4B36C00284F29 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */; };
+		E2169CE91DF7404700284F29 /* send100.png in Resources */ = {isa = PBXBuildFile; fileRef = E2169CE81DF7404700284F29 /* send100.png */; };
+		E2169CEB1DF7416200284F29 /* read100.png in Resources */ = {isa = PBXBuildFile; fileRef = E2169CEA1DF7416200284F29 /* read100.png */; };
 		E26248D51DEC88DD00076DD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D41DEC88DD00076DD1 /* AppDelegate.swift */; };
 		E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D61DEC88DD00076DD1 /* ViewController.swift */; };
 		E26248DA1DEC88DD00076DD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26248D81DEC88DD00076DD1 /* Main.storyboard */; };
@@ -28,6 +30,8 @@
 		E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActiveUserTableViewCell.swift; sourceTree = "<group>"; };
 		E2169CDD1DF4B15800284F29 /* ChatViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
+		E2169CE81DF7404700284F29 /* send100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = send100.png; path = ../../../Downloads/send100.png; sourceTree = "<group>"; };
+		E2169CEA1DF7416200284F29 /* read100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = read100.png; path = ../../../Downloads/read100.png; sourceTree = "<group>"; };
 		E26248D11DEC88DD00076DD1 /* IMessenger_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IMessenger_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26248D41DEC88DD00076DD1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26248D61DEC88DD00076DD1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +68,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E2169CE71DF73F2400284F29 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				E2169CE81DF7404700284F29 /* send100.png */,
+				E2169CEA1DF7416200284F29 /* read100.png */,
+			);
+			name = icons;
+			sourceTree = "<group>";
+		};
 		E26248C81DEC88DD00076DD1 = {
 			isa = PBXGroup;
 			children = (
@@ -84,13 +97,14 @@
 		E26248D31DEC88DD00076DD1 /* IMessenger_iOS */ = {
 			isa = PBXGroup;
 			children = (
+				E2169CE71DF73F2400284F29 /* icons */,
 				E26248F61DEC8E7000076DD1 /* ObjC */,
 				E26248D41DEC88DD00076DD1 /* AppDelegate.swift */,
-				E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */,
 				E26248D61DEC88DD00076DD1 /* ViewController.swift */,
+				E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */,
+				E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */,
 				E2169CDD1DF4B15800284F29 /* ChatViewController.swift */,
 				E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */,
-				E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */,
 				E26248D81DEC88DD00076DD1 /* Main.storyboard */,
 				E26248DB1DEC88DD00076DD1 /* Assets.xcassets */,
 				E26248DD1DEC88DD00076DD1 /* LaunchScreen.storyboard */,
@@ -206,7 +220,9 @@
 			files = (
 				E26248DF1DEC88DD00076DD1 /* LaunchScreen.storyboard in Resources */,
 				E26248DC1DEC88DD00076DD1 /* Assets.xcassets in Resources */,
+				E2169CEB1DF7416200284F29 /* read100.png in Resources */,
 				E26248DA1DEC88DD00076DD1 /* Main.storyboard in Resources */,
+				E2169CE91DF7404700284F29 /* send100.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -348,6 +364,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = MGDFYF2DS8;
+				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = "/Users/IvanPryadchenko/Downloads/SafeBoardMessenger-master-2/Components/messenger/include";
 				INFOPLIST_FILE = IMessenger_iOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -369,6 +386,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = MGDFYF2DS8;
+				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = "/Users/IvanPryadchenko/Downloads/SafeBoardMessenger-master-2/Components/messenger/include";
 				INFOPLIST_FILE = IMessenger_iOS/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

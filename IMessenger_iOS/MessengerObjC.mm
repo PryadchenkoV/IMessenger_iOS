@@ -10,6 +10,7 @@
 #import "SettingsObjC.h"
 #include "messenger.h"
 #include "callbacks.h"
+#include "observers.h"
 
 
 class LoginCallbackObjC : public messenger::ILoginCallback
@@ -40,11 +41,32 @@ public:
 };
 
 
+class MessagesObserverObjC : public messenger::IMessagesObserver
+{
+public:
+    virtual void OnMessageStatusChanged(const MessageId& msgId, messenger::message_status::Type status)  {
+        if(m_handlerMessageStatusChanged){
+            m_handlerMessageStatusChanged(msgId,status);
+        }
+    }
+    virtual void OnMessageReceived(const UserId& senderId, const Message& msg) {
+        if(m_handlerMessageReceived){
+            m_handlerMessageReceived(senderId,msg);
+        }
+    }
+    
+    void (^m_handlerMessageStatusChanged)(const MessageId&, messenger::message_status::Type) = 0;
+    void (^m_handlerMessageReceived)(const UserId&, const Message&) = 0;
+};
+
+
+
 @interface MessengerObjC()
 {
     std::shared_ptr<messenger::IMessenger>   m_IMessenger;
     LoginCallbackObjC                        m_LoginCallback;
     RequestUsersCallbackObjC                 m_RequestLoginCallback;
+    std::shared_ptr<MessagesObserverObjC>    m_MessageObserver;
 }
 @property(assign) BOOL isConnecting;
 @property(assign) operationResult connectionStatus;
@@ -57,7 +79,7 @@ public:
     self = [super init];
     if (self) {
         messenger::MessengerSettings messengerSettingsStruct;
-        //messengerSettingsStruct.serverUrl = "192.168.0.105";
+        messengerSettingsStruct.serverUrl = "192.168.0.105";
         m_IMessenger = messenger::GetMessengerInstance(messengerSettingsStruct);
     }
     return self;
@@ -88,7 +110,7 @@ public:
     messenger::SecurityPolicy securityPolicyStruct;
 
     std::string userID = std::string([userId UTF8String]);
-    std::string userPassWord =std::string([password UTF8String]);
+    std::string userPassWord = std::string([password UTF8String]);
     
     
     m_IMessenger->Login(std::string([userId UTF8String]), std::string([password UTF8String]), securityPolicyStruct, &m_LoginCallback);
@@ -126,6 +148,50 @@ public:
         }
     };
     m_IMessenger->RequestActiveUsers(&m_RequestLoginCallback);
+}
+
+-(Message*)sendMessageToUser:(NSString*)user messageContent:(MessageContentObjC*)message {
+    messenger::MessageContent messageContent = *new messenger::MessageContent;
+    
+    
+    std::string dataFormNSString = std::string([message.data UTF8String]);
+    std::vector<unsigned char> vectorData;
+    for (std::string::iterator it = dataFormNSString.begin() ; it < dataFormNSString.end(); ++it) {
+        vectorData.push_back(*it);
+
+    }
+    messageContent.data = vectorData;
+    
+    messenger::Message sentMessageC = m_IMessenger->SendMessage(std::string([user UTF8String]).c_str(), messageContent);
+    
+    Message* sentMessageObjC = [[Message alloc]init];
+    sentMessageObjC.identifier = [NSString stringWithCString:sentMessageC.identifier.c_str()
+                                                    encoding:[NSString defaultCStringEncoding]];
+    sentMessageObjC.date = [NSDate dateWithTimeIntervalSince1970:sentMessageC.time];
+    
+    MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
+    tmpContent.encrypted = sentMessageC.content.encrypted;
+    switch (sentMessageC.content.type) {
+        case messenger::message_content_type::Text:
+            tmpContent.type = Text;
+            break;
+        case messenger::message_content_type::Image:
+            tmpContent.type = Image;
+            break;
+        case messenger::message_content_type::Video:
+            tmpContent.type = Video;
+            break;
+        default:
+            break;
+    }
+    tmpContent.data = message.data;
+    sentMessageObjC.content = tmpContent;
+    
+    return sentMessageObjC;
+}
+
+-(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID {
+    m_IMessenger->SendMessageSeen(std::string([userID UTF8String]), std::string([messageID UTF8String]));
 }
 
 @end

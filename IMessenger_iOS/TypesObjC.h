@@ -50,7 +50,7 @@ typedef NSString* UserId;
 
 @property(nonatomic) messageContentType type;
 @property(assign,nonatomic) BOOL encrypted;
-@property(nonatomic) NSData* data;
+@property(nonatomic) NSString* data;
 
 -(instancetype)init;
 

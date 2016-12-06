@@ -19,5 +19,7 @@
 -(void)loginWithUserId:(UserId)userId password:(NSString*)password completionBlock:(void(^)(operationResult))completionBlock;
 -(void)disconnectFromServer;
 -(void)requestActiveUsersWithEndBlock:(void(^)(operationResult,NSMutableArray*))completionBlock;
+-(Message*)sendMessageToUser:(NSString*)user messageContent:(MessageContentObjC*)message;
+-(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID;
 
 @end

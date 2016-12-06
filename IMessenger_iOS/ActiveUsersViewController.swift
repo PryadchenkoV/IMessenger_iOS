@@ -16,6 +16,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var barButtonDisconnect: UIBarButtonItem!
     
+    var userName = ""
     var arrayOfUsers = [String]()
     
     override func viewDidLoad() {
@@ -40,6 +41,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             }
 
         }
+        arrayOfUsers.sort()
         
     }
 
@@ -54,6 +56,12 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
         cellActiveUsers.lableNameOfUser.text = arrayOfUsers[indexPath.row]
         return cellActiveUsers
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        userName = arrayOfUsers[indexPath.row]
+        tableView.deselectRow(at: indexPath, animated: true)
+        performSegue(withIdentifier: kSegueFromActiveUsersToChat, sender: self)
+    }
 
     @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
         switch sender{
@@ -61,6 +69,14 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             messengerInstance.disconnectFromServer()
         default:
             break
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == kSegueFromActiveUsersToChat {
+            if let destinantionController = segue.destination as? ChatViewController {
+                destinantionController.nameOfUser = userName
+            }
         }
     }
 

@@ -11,7 +11,9 @@ import UIKit
 class ChatTableViewCell: UITableViewCell {
 
     
+    @IBOutlet weak var lableFromWhomMessenge: UILabel!
     @IBOutlet weak var chatLable: UILabel!
+    @IBOutlet weak var imageViewStatus: UIImageView!
     
     override func awakeFromNib() {
         super.awakeFromNib()

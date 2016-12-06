@@ -9,6 +9,7 @@
 import UIKit
 
 let kSegueFromLoginToActiveUsers = "fromLoginToActiveUsers"
+let kSegueFromActiveUsersToChat = "fromActiveUsersToChat"
 let messengerInstance = MessengerObjC()
 
 
@@ -17,6 +18,7 @@ class ViewController: UIViewController {
     @IBOutlet weak var lableLogin: UITextField!
     @IBOutlet weak var lablePassword: UITextField!
     @IBOutlet weak var buttonLogin: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
