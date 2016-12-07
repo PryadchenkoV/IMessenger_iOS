@@ -12,6 +12,7 @@ let kSegueFromLoginToActiveUsers = "fromLoginToActiveUsers"
 let kSegueFromActiveUsersToChat = "fromActiveUsersToChat"
 let messengerInstance = MessengerObjC()
 var loginUserID = ""
+var passwordUser = ""
 
 
 class ViewController: UIViewController {
@@ -41,6 +42,7 @@ class ViewController: UIViewController {
             switch result {
             case Ok:
                 loginUserID = self.lableLogin.text!
+                passwordUser = self.lablePassword.text!
                 DispatchQueue.main.async {
                     self.performSegue(withIdentifier: kSegueFromLoginToActiveUsers, sender:self)
                 }

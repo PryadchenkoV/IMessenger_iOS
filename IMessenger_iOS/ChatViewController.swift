@@ -94,6 +94,8 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         textFieldChat.delegate = self
         tableViewChat.delegate = self
         tableViewChat.dataSource = self
+        tableViewChat.estimatedRowHeight = 44.0
+        tableViewChat.rowHeight = UITableViewAutomaticDimension
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(notification:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
     }
@@ -173,7 +175,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         } else {
             cell.lableFromWhomMessenge.text = "From:"
             cell.imageViewStatus.image = nil
-            cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.6)
+            cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
         }
         cell.chatLable.text = messageFullArray[indexPath.row].1.content.data
         //cell.chatLable.text = messengesArray[indexPath.row].content.data

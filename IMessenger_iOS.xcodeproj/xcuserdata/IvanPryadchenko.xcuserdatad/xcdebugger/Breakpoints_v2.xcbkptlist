@@ -10,7 +10,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IMessenger_iOS/ChatViewController.swift"
-            timestampString = "502837051.054898"
+            timestampString = "502841641.645971"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "46"
@@ -26,12 +26,12 @@
                   moduleName = "IMessenger_iOS"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/IvanPryadchenko/Develop/IMessenger_iOS/IMessenger_iOS/ChatViewController.swift"
-                  timestampString = "502837165.586074"
+                  timestampString = "502841642.01041"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "46"
                   endingLineNumber = "46"
-                  offsetFromSymbolStart = "264">
+                  offsetFromSymbolStart = "321">
                </Location>
                <Location
                   shouldBeEnabled = "Yes"
@@ -41,12 +41,12 @@
                   moduleName = "IMessenger_iOS"
                   usesParentBreakpointCondition = "Yes"
                   urlString = "file:///Users/IvanPryadchenko/Develop/IMessenger_iOS/IMessenger_iOS/ChatViewController.swift"
-                  timestampString = "502837165.588546"
+                  timestampString = "502841642.017666"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "47"
                   endingLineNumber = "47"
-                  offsetFromSymbolStart = "68">
+                  offsetFromSymbolStart = "60">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IMessenger_iOS/ViewController.swift"
-            timestampString = "502836469.160726"
+            timestampString = "502845992.592877"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "43"
-            endingLineNumber = "43"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
             landmarkName = "buttonLoginPushed(_:)"
             landmarkType = "7">
          </BreakpointContent>

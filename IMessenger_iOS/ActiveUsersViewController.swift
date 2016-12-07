@@ -96,10 +96,19 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
                         self.tableViewActiveUsers.reloadData()
                     }
                 case AuthError:
+                    DispatchQueue.main.async {
+                        self.createAlertView(stringToPresent: "Authentification Error")
+                    }
                     print("AuthError")
                 case InternalError:
+                    DispatchQueue.main.async {
+                        self.createAlertView(stringToPresent: "Internal Error")
+                    }
                     print("InternalError")
                 case NetworkError:
+                    DispatchQueue.main.async {
+                        self.createAlertView(stringToPresent: "Network Error")
+                    }
                     print("NetworkError")
                 default:
                     print("Default")
@@ -121,9 +130,42 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     func createAlertView(stringToPresent:String) {
         let alertController = UIAlertController(title: "Try again", message: stringToPresent, preferredStyle: .alert)
         
-        let cancelAction = UIAlertAction(title: "Ok", style: .default) { (action) in
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
         }
+        let refreshAction = UIAlertAction(title: "Refresh", style: .default, handler: { (action) in
+            messengerInstance.requestActiveUsers { (operationResult, NSMutableArray) in
+                switch operationResult {
+                case Ok:
+                    for user in NSMutableArray! {
+                        let userObj = user as! UserObjC
+                        self.arrayOfUsers.append(userObj.userId)
+                    }
+                    DispatchQueue.main.async {
+                        self.tableViewActiveUsers.reloadData()
+                    }
+                case AuthError:
+                    DispatchQueue.main.async {
+                        self.createAlertView(stringToPresent: "Authentification Error")
+                    }
+                    print("AuthError")
+                case InternalError:
+                    DispatchQueue.main.async {
+                        self.createAlertView(stringToPresent: "Internal Error")
+                    }
+                    print("InternalError")
+                case NetworkError:
+                    DispatchQueue.main.async {
+                        self.createAlertView(stringToPresent: "Network Error")
+                    }
+                    print("NetworkError")
+                default:
+                    print("Default")
+                }
+
+            }
+        })
         alertController.addAction(cancelAction)
+        alertController.addAction(refreshAction)
         self.present(alertController, animated: true) {
         }
     }
