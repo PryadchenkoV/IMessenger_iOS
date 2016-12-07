@@ -21,6 +21,9 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     // MARK: - Var and let
     
+
+    var messageFullArray = [(String,Message)]()
+    
     var messengesArray = [Message]()
     var keyboardHeight = CGFloat(0)
     var nameOfUser = ""
@@ -44,16 +47,20 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             if let userID = string {
                 if userID == self.nameOfUser {
                     self.flagFromWhom = 1
-                    self.messengesArray = [message!] + self.messengesArray
+                    self.messageFullArray = [(self.title!, message!)] + self.messageFullArray
+                    //self.messengesArray = [message!] + self.messengesArray
                     DispatchQueue.main.async {
                         self.tableViewChat.beginUpdates()
                         self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .right)
+                        if self.messageFullArray.count > 1{
+                            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+                        }
                         self.tableViewChat.endUpdates()
                     }
                 }
             } else {
                 var indexCount = -1
-                for messageInArray in self.messengesArray {
+                for (_,messageInArray) in self.messageFullArray {
                     indexCount += 1
                     if messageInArray.identifier == message!.identifier {
                         let indexOfMessage = indexCount
@@ -73,9 +80,12 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
                                 break
                             }
                             self.tableViewChat.beginUpdates()
+                            let tmpFlag = self.flagFromWhom
+                            self.flagFromWhom = 0
                             self.tableViewChat.deleteRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
                             self.tableViewChat.insertRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
                             self.tableViewChat.endUpdates()
+                            self.flagFromWhom = tmpFlag
                         }
                     }
                 }
@@ -108,38 +118,65 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        DispatchQueue.main.async {
-            messengerInstance.sentMessageSeen(withId: self.messengesArray[indexPath.row].identifier, fromUser: self.title)
+        if messageFullArray[indexPath.row].0 == self.title! {
+            DispatchQueue.main.async {
+                
+                messengerInstance.sentMessageSeen(withId: self.messageFullArray[indexPath.row].1.identifier, fromUser: self.title)
+            }
         }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messengesArray.count
+        return messageFullArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kChatCellReuseableID, for: indexPath) as! ChatTableViewCell
-        switch flagFromWhom {
-        case 0: cell.lableFromWhomMessenge.text = "To:"
-        switch(flagStatus) {
-        case 1:
-            cell.imageViewStatus.image = imageSendingMail
-        case 2:
-            cell.imageViewStatus.image = imageSentMail
-        case 3:
-            cell.imageViewStatus.image = imageFailedMail
-        case 4:
-            cell.imageViewStatus.image = imageDeliveredMail
-        case 5:
-            cell.imageViewStatus.image = imageReadMail
-        default:
-            break
-            }
-        case 1: cell.lableFromWhomMessenge.text = "From:"
-        default:
-            break
+//        switch flagFromWhom {
+//        case 0: cell.lableFromWhomMessenge.text = "To:"
+//        switch(flagStatus) {
+//            case 1:
+//                cell.imageViewStatus.image = imageSendingMail
+//            case 2:
+//                cell.imageViewStatus.image = imageSentMail
+//            case 3:
+//                cell.imageViewStatus.image = imageFailedMail
+//            case 4:
+//                cell.imageViewStatus.image = imageDeliveredMail
+//            case 5:
+//                cell.imageViewStatus.image = imageReadMail
+//            default:
+//                break
+//            }
+//        case 1: cell.lableFromWhomMessenge.text = "From:"
+//            cell.imageViewStatus.image = nil
+//        default:
+//            break
+//        }
+        if (messageFullArray[indexPath.row].0 == loginUserID){
+            cell.lableFromWhomMessenge.text = "To:"
+            cell.backgroundColor = UIColor.white
+                switch(flagStatus) {
+                    case 1:
+                        cell.imageViewStatus.image = imageSendingMail
+                    case 2:
+                        cell.imageViewStatus.image = imageSentMail
+                    case 3:
+                        cell.imageViewStatus.image = imageFailedMail
+                    case 4:
+                        cell.imageViewStatus.image = imageDeliveredMail
+                    case 5:
+                        cell.imageViewStatus.image = imageReadMail
+                    default:
+                        break
+                    }
+        } else {
+            cell.lableFromWhomMessenge.text = "From:"
+            cell.imageViewStatus.image = nil
+            cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.6)
         }
-        cell.chatLable.text = messengesArray[indexPath.row].content.data
+        cell.chatLable.text = messageFullArray[indexPath.row].1.content.data
+        //cell.chatLable.text = messengesArray[indexPath.row].content.data
         return cell
     }
     
@@ -153,13 +190,19 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         textFieldChat.text = ""
         let messengeSend = messengerInstance.sendMessage(toUser: nameOfUser, messageContent: messageContentInstance)
         flagFromWhom = 0
-        messengesArray = [(messengeSend)!] + messengesArray
+        messageFullArray = [(loginUserID, messengeSend!)] + messageFullArray
+        //messengesArray = [(messengeSend)!] + messengesArray
+        //tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
         self.tableViewChat.beginUpdates()
         self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+        if messageFullArray.count > 1{
+            tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+        }
         self.tableViewChat.endUpdates()
-        
-        
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        constraintBottomTableView.constant -= keyboardHeight
+    }
 
 }

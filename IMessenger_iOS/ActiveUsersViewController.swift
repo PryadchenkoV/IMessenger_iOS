@@ -16,12 +16,14 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var barButtonDisconnect: UIBarButtonItem!
     
+    @IBOutlet weak var lableUserID: UILabel!
     @IBOutlet weak var barButtonRefresh: UIBarButtonItem!
     var userName = ""
     var arrayOfUsers = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        lableUserID.text = loginUserID
         tableViewActiveUsers.delegate = self
         tableViewActiveUsers.dataSource = self
         messengerInstance.requestActiveUsers { (operationResult, arrayOfUsers) in

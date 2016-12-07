@@ -11,6 +11,7 @@ import UIKit
 let kSegueFromLoginToActiveUsers = "fromLoginToActiveUsers"
 let kSegueFromActiveUsersToChat = "fromActiveUsersToChat"
 let messengerInstance = MessengerObjC()
+var loginUserID = ""
 
 
 class ViewController: UIViewController {
@@ -39,6 +40,7 @@ class ViewController: UIViewController {
             self.activityIndicator.stopAnimating()
             switch result {
             case Ok:
+                loginUserID = self.lableLogin.text!
                 DispatchQueue.main.async {
                     self.performSegue(withIdentifier: kSegueFromLoginToActiveUsers, sender:self)
                 }
