@@ -85,7 +85,7 @@
             </objects>
             <point key="canvasLocation" x="1141.5999999999999" y="-545.57721139430294"/>
         </scene>
-        <!--Online Users-->
+        <!--Active Users View Controller-->
         <scene sceneID="B0h-8T-Ybi">
             <objects>
                 <viewController automaticallyAdjustsScrollViewInsets="NO" id="Fdc-YS-wMk" customClass="ActiveUsersViewController" customModule="IMessenger_iOS" customModuleProvider="target" sceneMemberID="viewController">
@@ -138,14 +138,14 @@
                         </constraints>
                     </view>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Online Users" id="Bx4-BZ-r7Y">
+                    <navigationItem key="navigationItem" id="Bx4-BZ-r7Y">
                         <rightBarButtonItems>
                             <barButtonItem systemItem="refresh" id="cdv-3a-PMk">
                                 <connections>
                                     <action selector="barButtonPushed:" destination="Fdc-YS-wMk" id="cDO-w5-2o9"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem title="Disc." systemItem="stop" id="zvt-oD-N1Y">
+                            <barButtonItem systemItem="stop" id="zvt-oD-N1Y">
                                 <connections>
                                     <action selector="barButtonPushed:" destination="Fdc-YS-wMk" id="nN5-xa-f4p"/>
                                 </connections>
@@ -208,7 +208,7 @@
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="send100.png" translatesAutoresizingMaskIntoConstraints="NO" id="Uvs-vD-RvZ">
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Uvs-vD-RvZ">
                                                     <rect key="frame" x="357" y="26" width="10" height="10"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="10" id="QXt-3e-Qsp"/>
@@ -294,7 +294,4 @@
             <point key="canvasLocation" x="292" y="-545.57721139430294"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="send100.png" width="100" height="100"/>
-    </resources>
 </document>

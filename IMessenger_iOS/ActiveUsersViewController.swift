@@ -24,18 +24,27 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
         super.viewDidLoad()
         tableViewActiveUsers.delegate = self
         tableViewActiveUsers.dataSource = self
-        messengerInstance.requestActiveUsers { (operationResult, NSMutableArray) in
+        messengerInstance.requestActiveUsers { (operationResult, arrayOfUsers) in
             switch operationResult {
             case Ok:
-                for user in NSMutableArray! {
+                for user in arrayOfUsers! {
                     let userObj = user as! UserObjC
                     self.arrayOfUsers.append(userObj.userId)
                 }
             case AuthError:
+                DispatchQueue.main.async {
+                    self.createAlertView(stringToPresent: "Authentification Error")
+                }
                 print("AuthError")
             case InternalError:
+                DispatchQueue.main.async {
+                    self.createAlertView(stringToPresent: "Internal Error")
+                }
                 print("InternalError")
             case NetworkError:
+                DispatchQueue.main.async {
+                    self.createAlertView(stringToPresent: "Network Error")
+                }
                 print("NetworkError")
             default:
                 print("Default")
@@ -104,6 +113,16 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             if let destinantionController = segue.destination as? ChatViewController {
                 destinantionController.nameOfUser = userName
             }
+        }
+    }
+    
+    func createAlertView(stringToPresent:String) {
+        let alertController = UIAlertController(title: "Try again", message: stringToPresent, preferredStyle: .alert)
+        
+        let cancelAction = UIAlertAction(title: "Ok", style: .default) { (action) in
+        }
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true) {
         }
     }
 

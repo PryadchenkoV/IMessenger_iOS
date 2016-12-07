@@ -14,6 +14,8 @@ let messengerInstance = MessengerObjC()
 
 
 class ViewController: UIViewController {
+    
+    let activityIndicator: UIActivityIndicatorView = UIActivityIndicatorView.init(activityIndicatorStyle: .gray)
 
     @IBOutlet weak var lableLogin: UITextField!
     @IBOutlet weak var lablePassword: UITextField!
@@ -30,7 +32,11 @@ class ViewController: UIViewController {
     }
 
     @IBAction func buttonLoginPushed(_ sender: UIButton) {
+        let refreshBarButton: UIBarButtonItem = UIBarButtonItem(customView: activityIndicator)
+        self.navigationItem.rightBarButtonItem = refreshBarButton
+        self.activityIndicator.startAnimating()
         messengerInstance.login(withUserId: lableLogin.text, password: lablePassword.text) { (result) in
+            self.activityIndicator.stopAnimating()
             switch result {
             case Ok:
                 DispatchQueue.main.async {

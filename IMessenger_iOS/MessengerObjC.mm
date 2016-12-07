@@ -84,7 +84,7 @@ public:
     self = [super init];
     if (self) {
         messenger::MessengerSettings messengerSettingsStruct;
-        messengerSettingsStruct.serverUrl = "192.168.0.105";
+        messengerSettingsStruct.serverUrl = "192.168.0.102";
         m_IMessenger = messenger::GetMessengerInstance(messengerSettingsStruct);
     }
     return self;
@@ -133,8 +133,7 @@ public:
             case messenger::operation_result::Type::Ok:
                 for(messenger::User const& value: user) {
                     UserObjC* tmpUser = [[UserObjC alloc]init];
-                    tmpUser.userId = [NSString stringWithCString:value.identifier.c_str()
-                                                        encoding:[NSString defaultCStringEncoding]];
+                    tmpUser.userId = [NSString stringWithUTF8String:value.identifier.c_str()];
                     [usersOnline addObject: tmpUser];
                 }
                 completionBlock(Ok,usersOnline);
@@ -170,8 +169,7 @@ public:
     messenger::Message sentMessageC = m_IMessenger->SendMessage(std::string([user UTF8String]).c_str(), messageContent);
     
     Message* sentMessageObjC = [[Message alloc]init];
-    sentMessageObjC.identifier = [NSString stringWithCString:sentMessageC.identifier.c_str()
-                                                    encoding:[NSString defaultCStringEncoding]];
+    sentMessageObjC.identifier = [NSString stringWithUTF8String:sentMessageC.identifier.c_str()];
     sentMessageObjC.date = [NSDate dateWithTimeIntervalSince1970:sentMessageC.time];
     
     MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
@@ -196,6 +194,7 @@ public:
 }
 
 -(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID {
+    
     m_IMessenger->SendMessageSeen(std::string([userID UTF8String]), std::string([messageID UTF8String]));
 }
 
@@ -203,8 +202,7 @@ public:
     m_MessageObserver.m_handlerMessageReceived = ^(const messenger::UserId& userID, const messenger::Message& message){
         
         Message* tmpMessage = [[Message alloc]init];
-        tmpMessage.identifier = [NSString stringWithCString:message.identifier.c_str()
-                                                        encoding:[NSString defaultCStringEncoding]];
+        tmpMessage.identifier = [NSString stringWithUTF8String:message.identifier.c_str()];
         tmpMessage.date = [NSDate dateWithTimeIntervalSince1970:message.time];
         
         MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
@@ -222,15 +220,14 @@ public:
             default:
                 break;
         }
-        NSMutableString* tmpString = [[NSMutableString alloc]init];
-        for(char const& value: message.content.data) {
-            [tmpString appendFormat:@"%c", value];
+        std::string tmpString;
+        for (auto const& value: message.content.data) {
+            tmpString += value;
         }
-        tmpContent.data = tmpString;
+        tmpContent.data = [NSString stringWithUTF8String:tmpString.c_str()];
         tmpMessage.content = tmpContent;
 
-        completionBlock([NSString stringWithCString:userID.c_str()
-                                           encoding:[NSString defaultCStringEncoding]],tmpMessage,FailedToSend);
+        completionBlock([NSString stringWithUTF8String:userID.c_str()],tmpMessage,FailedToSend);
     };
     
     m_MessageObserver.m_handlerMessageStatusChanged = ^(const messenger::MessageId& messageID, messenger::message_status::Type messageStatus){
@@ -255,8 +252,7 @@ public:
                 break;
         }
         Message* tmpMessage = [[Message alloc]init];
-        tmpMessage.identifier = [NSString stringWithCString:messageID.c_str()
-                                                   encoding:[NSString defaultCStringEncoding]];
+        tmpMessage.identifier = [NSString stringWithUTF8String:messageID.c_str()];
         completionBlock(nil,tmpMessage,tmpStatus);
     };
     m_IMessenger->RegisterObserver(&m_MessageObserver);
