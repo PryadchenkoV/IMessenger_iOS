@@ -26,8 +26,9 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
 
     var messageFullArray = [(String,Message)]()
+    var messageArray = [(String,Message,messageStatus)]()
     
-    var messengesArray = [Message]()
+    
     var keyboardHeight = CGFloat(0)
     var nameOfUser = ""
     
@@ -203,8 +204,8 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         var bufArrayOfMessages = [Message]()
         
         for (user,message) in messageFullArray {
-            bufArrayOfSenders = [user] + bufArrayOfSenders
-            bufArrayOfMessages = [message] + bufArrayOfMessages
+            bufArrayOfSenders += [user]
+            bufArrayOfMessages += [message]
         }
         let userDefaultes = UserDefaults.standard
         userDefaultes.set(bufArrayOfSenders, forKey: self.title! + "Senders")
