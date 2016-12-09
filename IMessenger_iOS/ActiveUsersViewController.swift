@@ -7,7 +7,10 @@
 //
 
 import UIKit
+import AVFoundation
 
+
+let kSystemSoundIDForNotifications: SystemSoundID = 1016
 let kCellActiveUserReusedID = "cellActiveUser"
 
 class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -66,6 +69,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func onMessageReceived(notification:Notification) {
+        AudioServicesPlaySystemSound(kSystemSoundIDForNotifications)
         let userInfo = notification.userInfo! as NSDictionary
         let message = userInfo["Message"] as! Message
         let sender = userInfo["Sender"] as! String

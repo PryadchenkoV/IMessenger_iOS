@@ -215,6 +215,22 @@ public:
                     UserObjC* tmpUser = [[UserObjC alloc]init];
                     tmpUser.userId = [NSString stringWithUTF8String:value.identifier.c_str()];
                     SecurityPolicyObjC* tmpSecurity = [[SecurityPolicyObjC alloc]init];
+                    std::string tmpPubKey;
+                    for (auto const& valueKey: value.securityPolicy.encryptionPubKey) {
+                        tmpPubKey += valueKey;
+                    }
+                    tmpSecurity.encriptionPubKey = [NSString stringWithUTF8String:tmpPubKey.c_str()];
+                    switch (value.securityPolicy.encryptionAlgo) {
+                        case messenger::encryption_algorithm::None :
+                            tmpSecurity.encriptionAlgo = None;
+                            break;
+                        case messenger::encryption_algorithm::RSA_1024 :
+                            tmpSecurity.encriptionAlgo = RSA_1024;
+                            break;
+                        default:
+                            break;
+                    }
+                    tmpUser.securityPolicy = tmpSecurity;
                     [usersOnline addObject: tmpUser];
                 }
                 completionBlock(Ok,usersOnline);

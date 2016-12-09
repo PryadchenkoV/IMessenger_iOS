@@ -41,7 +41,7 @@ typedef enum {
 }messageContentType;
 
 typedef NSMutableArray* Data;
-typedef NSMutableArray* SecPublicKey;
+typedef NSString* SecPublicKey;
 typedef NSString* MessageId;
 typedef NSString* UserId;
 
