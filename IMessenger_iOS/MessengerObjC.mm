@@ -13,6 +13,10 @@
 #include "observers.h"
 
 
+NSString* kNSkNSNotificationOnMessageStatusChanged = @"kNSNotificationOnMessageStatusChanged";
+NSString* kNSNotificationOnMessageReceived = @"kNSNotificationOnMessageReceived";
+
+
 class LoginCallbackObjC : public messenger::ILoginCallback
 {
 public:
@@ -49,18 +53,65 @@ class MessagesObserverObjC : public messenger::IMessagesObserver
 public:
     
     virtual void OnMessageStatusChanged(const messenger::MessageId& msgId, messenger::message_status::Type status) override {
-        if(m_handlerMessageStatusChanged){
-            m_handlerMessageStatusChanged(msgId,status);
-        }
-    }
-    virtual void OnMessageReceived(const messenger::UserId& senderId, const messenger::Message& msg) override  {
-        if(m_handlerMessageReceived){
-            m_handlerMessageReceived(senderId,msg);
+        NSMutableDictionary* dictionaryToSend = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSString stringWithUTF8String:msgId.c_str()], @"MessageID", nil];
+    
+        switch (status) {
+            case messenger::message_status::Sending:
+                [dictionaryToSend setObject:@"Sending" forKey:@"Status"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kNSkNSNotificationOnMessageStatusChanged object: nil userInfo:dictionaryToSend];
+                break;
+            case messenger::message_status::Sent:
+                [dictionaryToSend setObject:@"Sent" forKey:@"Status"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kNSkNSNotificationOnMessageStatusChanged object: nil userInfo:dictionaryToSend];
+                break;
+            case messenger::message_status::FailedToSend:
+                [dictionaryToSend setObject:@"FailedToSend" forKey:@"Status"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kNSkNSNotificationOnMessageStatusChanged object: nil userInfo:dictionaryToSend];
+                break;
+            case messenger::message_status::Delivered:
+                [dictionaryToSend setObject:@"Delivered" forKey:@"Status"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kNSkNSNotificationOnMessageStatusChanged object: nil userInfo:dictionaryToSend];
+                break;
+            case messenger::message_status::Seen:
+                [dictionaryToSend setObject:@"Seen" forKey:@"Status"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kNSkNSNotificationOnMessageStatusChanged object: nil userInfo:dictionaryToSend];
+                break;
+            default:
+                break;
         }
     }
     
-    void (^m_handlerMessageStatusChanged)(const messenger::MessageId&, messenger::message_status::Type) = 0;
-    void (^m_handlerMessageReceived)(const messenger::UserId&, const messenger::Message&) = 0;
+    virtual void OnMessageReceived(const messenger::UserId& senderId, const messenger::Message& msg) override  {
+        Message* tmpMessage = [[Message alloc]init];
+        
+        tmpMessage.identifier = [NSString stringWithUTF8String: msg.identifier.c_str()];
+        tmpMessage.date = [NSDate dateWithTimeIntervalSince1970: msg.time];
+        
+        MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
+        tmpContent.encrypted = msg.content.encrypted;
+        switch (msg.content.type) {
+            case messenger::message_content_type::Text:
+                tmpContent.type = Text;
+                break;
+            case messenger::message_content_type::Image:
+                tmpContent.type = Image;
+                break;
+            case messenger::message_content_type::Video:
+                tmpContent.type = Video;
+                break;
+            default:
+                break;
+        }
+        std::string tmpString;
+        for (auto const& value: msg.content.data) {
+            tmpString += value;
+        }
+        tmpContent.data = [NSString stringWithUTF8String:tmpString.c_str()];
+        tmpMessage.content = tmpContent;
+
+        NSDictionary* tmpDictionary = [[NSDictionary alloc] initWithObjectsAndKeys: tmpMessage, @"Message", [NSString stringWithUTF8String:senderId.c_str()], @"Sender",nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kNSNotificationOnMessageReceived object: nil userInfo:tmpDictionary];
+    }
 };
 
 
@@ -88,6 +139,35 @@ public:
         m_IMessenger = messenger::GetMessengerInstance(messengerSettingsStruct);
     }
     return self;
+}
+
+-(Message*)convertCMessageToObj:(messenger::Message&)message {
+    Message* tmpMessage = [[Message alloc]init];
+    tmpMessage.identifier = [NSString stringWithUTF8String: message.identifier.c_str()];
+    tmpMessage.date = [NSDate dateWithTimeIntervalSince1970: message.time];
+    
+    MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
+    tmpContent.encrypted = message.content.encrypted;
+    switch (message.content.type) {
+        case messenger::message_content_type::Text:
+            tmpContent.type = Text;
+            break;
+        case messenger::message_content_type::Image:
+            tmpContent.type = Image;
+            break;
+        case messenger::message_content_type::Video:
+            tmpContent.type = Video;
+            break;
+        default:
+            break;
+    }
+    std::string tmpString;
+    for (auto const& value: message.content.data) {
+        tmpString += value;
+    }
+    tmpContent.data = [NSString stringWithUTF8String:tmpString.c_str()];
+    tmpMessage.content = tmpContent;
+    return tmpMessage;
 }
 
 -(void)loginWithUserId:(UserId)userId password:(NSString*)password completionBlock:(void(^)(operationResult))complitionBlock {
@@ -134,7 +214,7 @@ public:
                 for(messenger::User const& value: user) {
                     UserObjC* tmpUser = [[UserObjC alloc]init];
                     tmpUser.userId = [NSString stringWithUTF8String:value.identifier.c_str()];
-                    
+                    SecurityPolicyObjC* tmpSecurity = [[SecurityPolicyObjC alloc]init];
                     [usersOnline addObject: tmpUser];
                 }
                 completionBlock(Ok,usersOnline);
@@ -168,29 +248,29 @@ public:
     messageContent.data = vectorData;
     
     messenger::Message sentMessageC = m_IMessenger->SendMessage(std::string([user UTF8String]).c_str(), messageContent);
-    
     Message* sentMessageObjC = [[Message alloc]init];
-    sentMessageObjC.identifier = [NSString stringWithUTF8String:sentMessageC.identifier.c_str()];
-    sentMessageObjC.date = [NSDate dateWithTimeIntervalSince1970:sentMessageC.time];
-    
-    MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
-    tmpContent.encrypted = sentMessageC.content.encrypted;
-    switch (sentMessageC.content.type) {
-        case messenger::message_content_type::Text:
-            tmpContent.type = Text;
-            break;
-        case messenger::message_content_type::Image:
-            tmpContent.type = Image;
-            break;
-        case messenger::message_content_type::Video:
-            tmpContent.type = Video;
-            break;
-        default:
-            break;
-    }
-    tmpContent.data = message.data;
-    sentMessageObjC.content = tmpContent;
-    
+    sentMessageObjC = [self convertCMessageToObj: sentMessageC];
+//    sentMessageObjC.identifier = [NSString stringWithUTF8String:sentMessageC.identifier.c_str()];
+//    sentMessageObjC.date = [NSDate dateWithTimeIntervalSince1970:sentMessageC.time];
+//    
+//    MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
+//    tmpContent.encrypted = sentMessageC.content.encrypted;
+//    switch (sentMessageC.content.type) {
+//        case messenger::message_content_type::Text:
+//            tmpContent.type = Text;
+//            break;
+//        case messenger::message_content_type::Image:
+//            tmpContent.type = Image;
+//            break;
+//        case messenger::message_content_type::Video:
+//            tmpContent.type = Video;
+//            break;
+//        default:
+//            break;
+//    }
+//    tmpContent.data = message.data;
+//    sentMessageObjC.content = tmpContent;
+//    
     return sentMessageObjC;
 }
 
@@ -199,63 +279,7 @@ public:
     m_IMessenger->SendMessageSeen(std::string([userID UTF8String]), std::string([messageID UTF8String]));
 }
 
--(void)registerObserverWithCompletionBlock:(void(^)(UserId,Message*, messageStatus))completionBlock  {
-    m_MessageObserver.m_handlerMessageReceived = ^(const messenger::UserId& userID, const messenger::Message& message){
-        
-        Message* tmpMessage = [[Message alloc]init];
-        tmpMessage.identifier = [NSString stringWithUTF8String:message.identifier.c_str()];
-        tmpMessage.date = [NSDate dateWithTimeIntervalSince1970:message.time];
-        
-        MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
-        tmpContent.encrypted = message.content.encrypted;
-        switch (message.content.type) {
-            case messenger::message_content_type::Text:
-                tmpContent.type = Text;
-                break;
-            case messenger::message_content_type::Image:
-                tmpContent.type = Image;
-                break;
-            case messenger::message_content_type::Video:
-                tmpContent.type = Video;
-                break;
-            default:
-                break;
-        }
-        std::string tmpString;
-        for (auto const& value: message.content.data) {
-            tmpString += value;
-        }
-        tmpContent.data = [NSString stringWithUTF8String:tmpString.c_str()];
-        tmpMessage.content = tmpContent;
-
-        completionBlock([NSString stringWithUTF8String:userID.c_str()],tmpMessage,FailedToSend);
-    };
-    
-    m_MessageObserver.m_handlerMessageStatusChanged = ^(const messenger::MessageId& messageID, messenger::message_status::Type messageStatus){
-        enum messageStatus tmpStatus;
-        switch (messageStatus) {
-            case messenger::message_status::Type::Sending:
-                tmpStatus = Sending;
-                break;
-            case messenger::message_status::Type::Sent:
-                tmpStatus = Sent;
-                break;
-            case messenger::message_status::Type::FailedToSend:
-                tmpStatus = FailedToSend;
-                break;
-            case messenger::message_status::Type::Delivered:
-                tmpStatus = Delivered;
-                break;
-            case messenger::message_status::Type::Seen:
-                tmpStatus = Seen;
-                break;
-            default:
-                break;
-        }
-        Message* tmpMessage = [[Message alloc]init];
-        tmpMessage.identifier = [NSString stringWithUTF8String:messageID.c_str()];
-        completionBlock(nil,tmpMessage,tmpStatus);
-    };
+-(void)registerObserver{
     m_IMessenger->RegisterObserver(&m_MessageObserver);
 }
 

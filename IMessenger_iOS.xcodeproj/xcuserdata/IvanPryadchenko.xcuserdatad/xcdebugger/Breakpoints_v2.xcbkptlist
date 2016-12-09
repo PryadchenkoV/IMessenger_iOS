@@ -9,54 +9,6 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "IMessenger_iOS/ChatViewController.swift"
-            timestampString = "502965973.489539"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "60"
-            endingLineNumber = "60"
-            landmarkName = "viewDidLoad()"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "IMessenger_iOS.ChatViewController.viewDidLoad () -&gt; ()"
-                  moduleName = "IMessenger_iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/IvanPryadchenko/Develop/IMessenger_iOS/IMessenger_iOS/ChatViewController.swift"
-                  timestampString = "502891839.332438"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "61"
-                  endingLineNumber = "61"
-                  offsetFromSymbolStart = "1832">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "IMessenger_iOS.ChatViewController.(viewDidLoad () -&gt; ()).(closure #1)"
-                  moduleName = "IMessenger_iOS"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/IvanPryadchenko/Develop/IMessenger_iOS/IMessenger_iOS/ChatViewController.swift"
-                  timestampString = "502891839.335962"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "62"
-                  endingLineNumber = "62"
-                  offsetFromSymbolStart = "68">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "IMessenger_iOS/ViewController.swift"
             timestampString = "502845992.592877"
             startingColumnNumber = "9223372036854775807"
@@ -74,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IMessenger_iOS/ChatViewController.swift"
-            timestampString = "502965973.489539"
+            timestampString = "502979841.682327"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "186"
-            endingLineNumber = "186"
+            startingLineNumber = "246"
+            endingLineNumber = "246"
             landmarkName = "buttonSendPushed(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -90,23 +42,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IMessenger_iOS/ChatViewController.swift"
-            timestampString = "502965973.489539"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
-            landmarkName = "viewDidLoad()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "IMessenger_iOS/ChatViewController.swift"
-            timestampString = "502965973.489539"
+            timestampString = "502973746.553463"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "54"
@@ -122,11 +58,43 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "IMessenger_iOS/ChatViewController.swift"
-            timestampString = "502965973.489539"
+            timestampString = "502973746.553463"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "55"
             endingLineNumber = "55"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "IMessenger_iOS/ChatViewController.swift"
+            timestampString = "502973746.553463"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "56"
+            endingLineNumber = "56"
+            landmarkName = "viewDidLoad()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "IMessenger_iOS/ChatViewController.swift"
+            timestampString = "502974135.542391"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
          </BreakpointContent>

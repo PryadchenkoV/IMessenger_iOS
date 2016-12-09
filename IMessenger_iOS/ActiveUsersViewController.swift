@@ -22,6 +22,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     var arrayOfUsers = [String]()
     var messageArray = [(String,Message)]()
     var flagNewMessage = false
+    var tmpDictionary = [String:Any]()
     
     
     override func viewDidLoad() {
@@ -58,41 +59,45 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             }
             
         }
-        
+        NotificationCenter.default.addObserver(self, selector: #selector(onMessageReceived), name: NSNotification.Name(rawValue: kNSNotificationOnMessageReceived), object: tmpDictionary)
         
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        
-        messengerInstance.registerObserver { (String, message, messageStatus) in
-            if let user = String {
-                self.messageArray = [(user, message!)] + self.messageArray
-                var indexForUpdate = 0
-                for (number,index) in self.arrayOfUsers.enumerated(){
-                    if index == user {
-                        indexForUpdate = number
-                        break
-                    }
-                }
-                //self.messengesArray = [message!] + self.messengesArray
-                DispatchQueue.main.async {
-                    self.tableViewActiveUsers.beginUpdates()
-                    self.tableViewActiveUsers.deleteRows(at: [IndexPath.init(row: indexForUpdate, section: 0)], with: .none)
-                    self.tableViewActiveUsers.insertRows(at: [IndexPath.init(row: indexForUpdate, section: 0)], with: .none)
-                    self.tableViewActiveUsers.scrollToRow(at: IndexPath.init(row: indexForUpdate, section: 0), at: .bottom, animated: true)
-                    self.tableViewActiveUsers.endUpdates()
-                }
-                
-            }
-        }
-        
-        messageArray.removeAll()
-        DispatchQueue.main.async {
-            self.tableViewActiveUsers.reloadData()
-        }
-
+    func onMessageReceived() {
+        print(tmpDictionary["Sender"]!)
     }
     
+//    override func viewWillAppear(_ animated: Bool) {
+//        
+//        messengerInstance.registerObserver { (String, message, messageStatus) in
+//            if let user = String {
+//                self.messageArray = [(user, message!)] + self.messageArray
+//                var indexForUpdate = 0
+//                for (number,index) in self.arrayOfUsers.enumerated(){
+//                    if index == user {
+//                        indexForUpdate = number
+//                        break
+//                    }
+//                }
+//                //self.messengesArray = [message!] + self.messengesArray
+//                DispatchQueue.main.async {
+//                    self.tableViewActiveUsers.beginUpdates()
+//                    self.tableViewActiveUsers.deleteRows(at: [IndexPath.init(row: indexForUpdate, section: 0)], with: .none)
+//                    self.tableViewActiveUsers.insertRows(at: [IndexPath.init(row: indexForUpdate, section: 0)], with: .none)
+//                    self.tableViewActiveUsers.scrollToRow(at: IndexPath.init(row: indexForUpdate, section: 0), at: .bottom, animated: true)
+//                    self.tableViewActiveUsers.endUpdates()
+//                }
+//                
+//            }
+//        }
+//        
+//        messageArray.removeAll()
+//        DispatchQueue.main.async {
+//            self.tableViewActiveUsers.reloadData()
+//        }
+//
+//    }
+//    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return arrayOfUsers.count
     }

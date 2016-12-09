@@ -10,6 +10,8 @@
 #import "TypesObjC.h"
 
 
+extern NSString* kNSkNSNotificationOnMessageStatusChanged;
+extern NSString* kNSNotificationOnMessageReceived;
 
 @interface MessengerObjC : NSObject
 
@@ -21,7 +23,7 @@
 -(void)requestActiveUsersWithEndBlock:(void(^)(operationResult,NSMutableArray*))completionBlock;
 -(Message*)sendMessageToUser:(NSString*)user messageContent:(MessageContentObjC*)message;
 -(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID;
--(void)registerObserverWithCompletionBlock:(void(^)(UserId,Message*, messageStatus))completionBlock;
+-(void)registerObserver;
 -(void)unregisterObserver;
 
 @end

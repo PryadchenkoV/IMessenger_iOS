@@ -26,7 +26,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
 
     var messageFullArray = [(String,Message)]()
-    var messageArray = [(String,Message,messageStatus)]()
+    var messageArray = [(String,Message,String)]()
     
     
     var keyboardHeight = CGFloat(0)
@@ -38,8 +38,8 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     let imageFailedMail = UIImage(named: "failed100")
     let imageSendingMail = UIImage(named: "sending100")
     
+    var tmpDictionary = [String:Any]()
     
-    var flagFromWhom = -1
     var flagStatus = -1
     
     // MARK: - Base Methods
@@ -54,65 +54,86 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
                 messageFullArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index])]
             }
         }
-        //var tmpArrayOfSenders = [String]()
-        //var tmpArryaOfMessage = [Message]()
-        
-        messengerInstance.registerObserver { (string, message, messageStatus) in
-            if let userID = string {
-                if userID == self.nameOfUser {
-                    self.flagFromWhom = 1
-                    self.messageFullArray = [(self.title!, message!)] + self.messageFullArray
-                    //self.messengesArray = [message!] + self.messengesArray
-                    DispatchQueue.main.async {
-                        self.tableViewChat.beginUpdates()
-                        self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .right)
-                        if self.messageFullArray.count > 1{
-                            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
-                        }
-                        self.tableViewChat.endUpdates()
-                    }
-                }
-            } else {
-                var indexCount = -1
-                for (_,messageInArray) in self.messageFullArray {
-                    indexCount += 1
-                    if messageInArray.identifier == message!.identifier {
-                        let indexOfMessage = indexCount
-                        DispatchQueue.main.async {
-                            switch(messageStatus) {
-                            case Sending:
-                                self.flagStatus = 1
-                            case Sent:
-                                self.flagStatus = 2
-                            case FailedToSend:
-                                self.flagStatus = 3
-                            case Delivered:
-                                self.flagStatus = 4
-                            case Seen:
-                                self.flagStatus = 5
-                            default:
-                                break
-                            }
-                            self.tableViewChat.beginUpdates()
-                            let tmpFlag = self.flagFromWhom
-                            self.flagFromWhom = 0
-                            self.tableViewChat.deleteRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
-                            self.tableViewChat.insertRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
-                            self.tableViewChat.endUpdates()
-                            self.flagFromWhom = tmpFlag
-                        }
-                    }
-                }
-            }
-        }
+    
         textFieldChat.delegate = self
         tableViewChat.delegate = self
         tableViewChat.dataSource = self
         tableViewChat.estimatedRowHeight = 44.0
         tableViewChat.rowHeight = UITableViewAutomaticDimension
+        messengerInstance.registerObserver()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onMessageReceived), name: NSNotification.Name(rawValue: kNSNotificationOnMessageReceived), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onStatusChanged),name: NSNotification.Name(rawValue: kNSkNSNotificationOnMessageStatusChanged), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(notification:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+
     }
+    
+    func onMessageReceived(notification: NSNotification) {
+        let userInfo = notification.userInfo! as NSDictionary
+        if userInfo["Sender"] as! String == self.nameOfUser {
+            let message = userInfo["Message"] as! Message
+            self.messageFullArray = [(self.title!, message)] + self.messageFullArray
+            self.messageArray = [(self.title!,message,"None")] + self.messageArray
+            DispatchQueue.main.async {
+                self.tableViewChat.beginUpdates()
+                self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .right)
+                if self.messageFullArray.count > 1{
+                    self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+                }
+                self.tableViewChat.endUpdates()
+            }
+
+        }
+    }
+    
+    func onStatusChanged(notification: NSNotification) {
+        let userInfo = notification.userInfo! as NSDictionary
+        let messageID = userInfo["MessageID"] as! String
+        let statusOfMessage = userInfo["Status"] as! String
+        var indexCount = -1
+        for (_,messageInArray) in self.messageFullArray {
+            indexCount += 1
+            if messageInArray.identifier == messageID {
+                
+                let indexOfMessage = indexCount
+                DispatchQueue.main.async {
+                    switch(statusOfMessage) {
+                    case "Sending":
+                        self.flagStatus = 1
+                    case "Sent":
+                        self.flagStatus = 2
+                    case "FailedToSend":
+                        self.flagStatus = 3
+                    case "Delivered":
+                        self.flagStatus = 4
+                    case "Seen":
+                        self.flagStatus = 5
+                    default:
+                        break
+                    }
+                    self.tableViewChat.beginUpdates()
+                    self.tableViewChat.reloadRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
+                    self.tableViewChat.endUpdates()
+                }
+            }
+        }
+        
+        //New
+        for indexCountInArray in (0..<self.messageArray.count){
+            if messageArray[indexCountInArray].0 == messageID {
+                messageArray[indexCountInArray].2 = statusOfMessage
+                let indexOfMessage = indexCountInArray
+                DispatchQueue.main.async {
+                    self.tableViewChat.beginUpdates()
+                    self.tableViewChat.reloadRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
+                    self.tableViewChat.endUpdates()
+                }
+                break
+            }
+        }
+        
+    }
+
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -185,7 +206,6 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         messageContentInstance?.data = textFieldChat.text
         textFieldChat.text = ""
         let messengeSend = messengerInstance.sendMessage(toUser: nameOfUser, messageContent: messageContentInstance)
-        flagFromWhom = 0
         messageFullArray = [(loginUserID, messengeSend!)] + messageFullArray
         //messengesArray = [(messengeSend)!] + messengesArray
         //tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
@@ -199,18 +219,26 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     override func viewWillDisappear(_ animated: Bool) {
         constraintBottomTableView.constant -= keyboardHeight
-        
         var bufArrayOfSenders = [String]()
         var bufArrayOfMessages = [Message]()
+        var bufArrayOfStatuses = [String]()
         
         for (user,message) in messageFullArray {
             bufArrayOfSenders += [user]
             bufArrayOfMessages += [message]
         }
+        
+//        for(user,message,status) in messageArray {
+//            bufArrayOfSenders += [user]
+//            bufArrayOfMessages += [message]
+//            bufArrayOfStatuses += [status]
+//        }
+//        
         let userDefaultes = UserDefaults.standard
         userDefaultes.set(bufArrayOfSenders, forKey: self.title! + "Senders")
         let data = NSKeyedArchiver.archivedData(withRootObject: bufArrayOfMessages)
         userDefaultes.set(data, forKey: self.title! + "Messages")
+        userDefaultes.set(bufArrayOfStatuses, forKey: self.title! + "Statuses")
     }
     
     override func viewWillAppear(_ animated: Bool) {
