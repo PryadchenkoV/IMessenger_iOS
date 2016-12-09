@@ -14,6 +14,7 @@ let kChatCellReuseableID = "chatTableViewCell"
 
 
 class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+    @IBOutlet weak var barButtonClearHistory: UIBarButtonItem!
     // MARK: - Outlets
     
     @IBOutlet weak var textFieldChat: UITextField!
@@ -46,7 +47,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         super.viewDidLoad()
         self.title = nameOfUser
         let userDefaultes = UserDefaults.standard
-        if let bufArrayOfSenders = userDefaultes.object(forKey: self.title! + "Senders") as? [String], let bufArrayOfData = userDefaultes.data(forKey: self.title! + "Messages"), let bufArrayOfStatuses = userDefaultes.object(forKey: self.title! + "Statuses") as? [String]{
+        if let bufArrayOfSenders = userDefaultes.object(forKey: loginUserID + self.title! + "Senders") as? [String], let bufArrayOfData = userDefaultes.data(forKey: loginUserID + self.title! + "Messages"), let bufArrayOfStatuses = userDefaultes.object(forKey: loginUserID + self.title! + "Statuses") as? [String]{
             let bufArrayOfMessage = NSKeyedUnarchiver.unarchiveObject(with: bufArrayOfData) as! [Message]
             for index in (0 ..< bufArrayOfSenders.count) {
                 messageArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index],bufArrayOfStatuses[index])]
@@ -202,11 +203,32 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         }
         
         let userDefaultes = UserDefaults.standard
-        userDefaultes.set(bufArrayOfSenders, forKey: self.title! + "Senders")
+        userDefaultes.set(bufArrayOfSenders, forKey: loginUserID + self.title! + "Senders")
         let data = NSKeyedArchiver.archivedData(withRootObject: bufArrayOfMessages)
-        userDefaultes.set(data, forKey: self.title! + "Messages")
-        userDefaultes.set(bufArrayOfStatuses, forKey: self.title! + "Statuses")
+        userDefaultes.set(data, forKey: loginUserID + self.title! + "Messages")
+        userDefaultes.set(bufArrayOfStatuses, forKey: loginUserID + self.title! + "Statuses")
     }
 
+    
+    @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
+        if sender == barButtonClearHistory {
+            
+            let alertController = UIAlertController(title: nil, message: "Are you such to clear the history?", preferredStyle: .actionSheet)
+            
+            let OKAction = UIAlertAction(title: "Yes", style: .default) { (action) in
+                DispatchQueue.main.async {
+                    self.messageArray.removeAll()
+                    self.tableViewChat.reloadData()
+                }
+                
+            }
+            alertController.addAction(OKAction)
+            let cancelAction = UIAlertAction(title: "Cancel", style: .destructive) { (action) in
+            }
+            alertController.addAction(cancelAction)
+            self.present(alertController, animated: true) {
+            }
+        }
+    }
 
 }

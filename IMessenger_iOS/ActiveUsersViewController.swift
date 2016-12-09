@@ -20,7 +20,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     @IBOutlet weak var barButtonRefresh: UIBarButtonItem!
     var userName = ""
     var arrayOfUsers = [String]()
-    var messageArray = [(String,Message)]()
+    var messageArray = [(String,Message,String)]()
     var flagNewMessage = false
     var tmpDictionary = [String:Any]()
     
@@ -59,45 +59,35 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             }
             
         }
-        NotificationCenter.default.addObserver(self, selector: #selector(onMessageReceived), name: NSNotification.Name(rawValue: kNSNotificationOnMessageReceived), object: tmpDictionary)
+        messengerInstance.registerObserver()
+        NotificationCenter.default.addObserver(self, selector: #selector(self.onMessageReceived), name: NSNotification.Name(rawValue: kNSNotificationOnMessageReceived), object: nil)
+
         
     }
     
-    func onMessageReceived() {
-        print(tmpDictionary["Sender"]!)
+    func onMessageReceived(notification:Notification) {
+        let userInfo = notification.userInfo! as NSDictionary
+        let message = userInfo["Message"] as! Message
+        let sender = userInfo["Sender"] as! String
+        self.messageArray = [(sender,message,"None")] + self.messageArray
+        var indexOfUser = 0
+        for (number,user) in arrayOfUsers.enumerated() {
+            if user == sender {
+                indexOfUser = number
+                break
+            }
+        }
+        DispatchQueue.main.async {
+            self.tableViewActiveUsers.beginUpdates()
+            self.tableViewActiveUsers.reloadRows(at: [IndexPath.init(row: indexOfUser, section: 0)], with: .none)
+            self.tableViewActiveUsers.endUpdates()
+        }
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        
-//        messengerInstance.registerObserver { (String, message, messageStatus) in
-//            if let user = String {
-//                self.messageArray = [(user, message!)] + self.messageArray
-//                var indexForUpdate = 0
-//                for (number,index) in self.arrayOfUsers.enumerated(){
-//                    if index == user {
-//                        indexForUpdate = number
-//                        break
-//                    }
-//                }
-//                //self.messengesArray = [message!] + self.messengesArray
-//                DispatchQueue.main.async {
-//                    self.tableViewActiveUsers.beginUpdates()
-//                    self.tableViewActiveUsers.deleteRows(at: [IndexPath.init(row: indexForUpdate, section: 0)], with: .none)
-//                    self.tableViewActiveUsers.insertRows(at: [IndexPath.init(row: indexForUpdate, section: 0)], with: .none)
-//                    self.tableViewActiveUsers.scrollToRow(at: IndexPath.init(row: indexForUpdate, section: 0), at: .bottom, animated: true)
-//                    self.tableViewActiveUsers.endUpdates()
-//                }
-//                
-//            }
-//        }
-//        
-//        messageArray.removeAll()
-//        DispatchQueue.main.async {
-//            self.tableViewActiveUsers.reloadData()
-//        }
-//
-//    }
-//    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return arrayOfUsers.count
     }
@@ -105,9 +95,15 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cellActiveUsers = tableView.dequeueReusableCell(withIdentifier: kCellActiveUserReusedID) as! ActiveUserTableViewCell
-        if messageArray.count > 0 && messageArray[messageArray.count - 1].0 == arrayOfUsers[indexPath.row] {
+        if messageArray.count > 0 && messageArray[0].0 == arrayOfUsers[indexPath.row] {
+            var numberOfNotifications = 0
+            for message in messageArray {
+                if message.0 == arrayOfUsers[indexPath.row] {
+                    numberOfNotifications += 1
+                }
+            }
             cellActiveUsers.lableNumberOfNotifications.isHidden = false
-            cellActiveUsers.lableNumberOfNotifications.text = String(Int(cellActiveUsers.lableNumberOfNotifications.text!)! + 1)
+            cellActiveUsers.lableNumberOfNotifications.text = String(numberOfNotifications)
         } else {
             cellActiveUsers.lableNumberOfNotifications.isHidden = true
         }
@@ -117,8 +113,22 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         userName = arrayOfUsers[indexPath.row]
+        
         tableView.deselectRow(at: indexPath, animated: true)
         performSegue(withIdentifier: kSegueFromActiveUsersToChat, sender: self)
+        var indexOfArray = 0
+        for _ in (0..<messageArray.count) {
+            if userName == messageArray[indexOfArray].0 {
+                messageArray.remove(at: indexOfArray)
+            } else {
+                indexOfArray += 1
+            }
+        }
+        DispatchQueue.main.async {
+            self.tableViewActiveUsers.beginUpdates()
+            self.tableViewActiveUsers.reloadRows(at: [indexPath], with: .none)
+            self.tableViewActiveUsers.endUpdates()
+        }
     }
 
     @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
@@ -165,7 +175,14 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
         if segue.identifier == kSegueFromActiveUsersToChat {
             if let destinantionController = segue.destination as? ChatViewController {
                 destinantionController.nameOfUser = userName
-                destinantionController.messageFullArray = messageArray
+                var bufTransportArray = [(String,Message,String)]()
+                for index in (0..<messageArray.count) {
+                    if messageArray[index].0 == userName {
+                        bufTransportArray += [(messageArray[index].0,messageArray[index].1,messageArray[index].2)]
+                    }
+                }
+                destinantionController.messageArray = bufTransportArray
+                
             }
         }
     }
@@ -213,10 +230,17 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        messengerInstance.unregisterObserver()
+    override func viewWillAppear(_ animated: Bool) {
+        var indexOfArray = 0
+        for _ in (0..<messageArray.count) {
+            if userName == messageArray[indexOfArray].0 {
+                messageArray.remove(at: indexOfArray)
+            } else {
+                indexOfArray += 1
+            }
+        }
+        tableViewActiveUsers.reloadData()
     }
-    
     /*
     // MARK: - Navigation
 
