@@ -84,7 +84,7 @@ public:
     self = [super init];
     if (self) {
         messenger::MessengerSettings messengerSettingsStruct;
-        messengerSettingsStruct.serverUrl = "192.168.0.102";
+        //messengerSettingsStruct.serverUrl = "172.20.10.3";
         m_IMessenger = messenger::GetMessengerInstance(messengerSettingsStruct);
     }
     return self;
@@ -134,6 +134,7 @@ public:
                 for(messenger::User const& value: user) {
                     UserObjC* tmpUser = [[UserObjC alloc]init];
                     tmpUser.userId = [NSString stringWithUTF8String:value.identifier.c_str()];
+                    
                     [usersOnline addObject: tmpUser];
                 }
                 completionBlock(Ok,usersOnline);
@@ -256,6 +257,10 @@ public:
         completionBlock(nil,tmpMessage,tmpStatus);
     };
     m_IMessenger->RegisterObserver(&m_MessageObserver);
+}
+
+-(void)unregisterObserver {
+    m_IMessenger->UnregisterObserver(&m_MessageObserver);
 }
 
 @end

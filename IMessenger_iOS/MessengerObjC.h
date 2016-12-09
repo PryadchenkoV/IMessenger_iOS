@@ -22,6 +22,6 @@
 -(Message*)sendMessageToUser:(NSString*)user messageContent:(MessageContentObjC*)message;
 -(void)sentMessageSeenWithId:(NSString*)messageID fromUser:(NSString*)userID;
 -(void)registerObserverWithCompletionBlock:(void(^)(UserId,Message*, messageStatus))completionBlock;
-
+-(void)unregisterObserver;
 
 @end

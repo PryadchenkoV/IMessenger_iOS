@@ -109,21 +109,34 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g58-Aw-Bka">
-                                                    <rect key="frame" x="24" y="8" width="343" height="27"/>
+                                                    <rect key="frame" x="16" y="8" width="311" height="27"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="25"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="58d-zc-WGN">
+                                                    <rect key="frame" x="335" y="11" width="32" height="21"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="32" id="mut-T3-eYe"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                                                    <color key="textColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
                                             </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="bottom" secondItem="g58-Aw-Bka" secondAttribute="bottom" constant="8" id="3LO-2c-QXU"/>
-                                                <constraint firstItem="g58-Aw-Bka" firstAttribute="leading" secondItem="ZUu-34-cGc" secondAttribute="leading" constant="24" id="ATH-7y-cNm"/>
-                                                <constraint firstAttribute="trailing" secondItem="g58-Aw-Bka" secondAttribute="trailing" constant="8" id="BXx-na-C0b"/>
-                                                <constraint firstItem="g58-Aw-Bka" firstAttribute="top" secondItem="ZUu-34-cGc" secondAttribute="top" constant="8" id="KTG-01-Pv9"/>
+                                                <constraint firstItem="58d-zc-WGN" firstAttribute="trailing" secondItem="ZUu-34-cGc" secondAttribute="trailingMargin" id="O4B-YF-QX4"/>
+                                                <constraint firstItem="g58-Aw-Bka" firstAttribute="bottom" secondItem="ZUu-34-cGc" secondAttribute="bottomMargin" id="QbB-H5-abt"/>
+                                                <constraint firstItem="g58-Aw-Bka" firstAttribute="leading" secondItem="ZUu-34-cGc" secondAttribute="leadingMargin" constant="8" id="VXc-xQ-pUw"/>
+                                                <constraint firstItem="58d-zc-WGN" firstAttribute="leading" secondItem="g58-Aw-Bka" secondAttribute="trailing" constant="8" id="XBk-gU-gkJ"/>
+                                                <constraint firstAttribute="bottomMargin" secondItem="58d-zc-WGN" secondAttribute="bottom" constant="3" id="e6m-sb-ZNR"/>
+                                                <constraint firstItem="g58-Aw-Bka" firstAttribute="top" secondItem="ZUu-34-cGc" secondAttribute="topMargin" id="gI8-6e-loX"/>
+                                                <constraint firstItem="58d-zc-WGN" firstAttribute="top" secondItem="ZUu-34-cGc" secondAttribute="topMargin" constant="3" id="iwU-gt-dr5"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
                                             <outlet property="lableNameOfUser" destination="g58-Aw-Bka" id="6Fg-6o-M3N"/>
+                                            <outlet property="lableNumberOfNotifications" destination="58d-zc-WGN" id="EJq-xY-NmI"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

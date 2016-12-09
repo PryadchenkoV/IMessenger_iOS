@@ -11,6 +11,7 @@ import UIKit
 class ActiveUserTableViewCell: UITableViewCell {
 
     
+    @IBOutlet weak var lableNumberOfNotifications: UILabel!
     @IBOutlet weak var lableNameOfUser: UILabel!
     
     override func awakeFromNib() {

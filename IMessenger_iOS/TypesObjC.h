@@ -11,7 +11,7 @@
 
 #pragma mark - enum init
 
-typedef enum operationResult{
+typedef enum {
     Ok,
     AuthError,
     NetworkError,
@@ -27,12 +27,14 @@ typedef enum messageStatus{
 }messageStatus;
 
 
-typedef enum encryptionAlgorithmType {
+typedef enum {
     None,
     RSA_1024
 }encryptionAlgorithmType;
 
-typedef enum messageContentType {
+
+
+typedef enum {
     Text,
     Image,
     Video
@@ -46,7 +48,7 @@ typedef NSString* UserId;
 
 #pragma mark - MessageContent
 
-@interface MessageContentObjC : NSObject
+@interface MessageContentObjC : NSObject <NSCoding>
 
 @property(nonatomic) messageContentType type;
 @property(assign,nonatomic) BOOL encrypted;
@@ -59,7 +61,7 @@ typedef NSString* UserId;
 #pragma mark - Message
 
 
-@interface Message : NSObject
+@interface Message : NSObject <NSCoding>
 
 @property MessageId identifier;
 @property(assign,nonatomic) NSDate* date;

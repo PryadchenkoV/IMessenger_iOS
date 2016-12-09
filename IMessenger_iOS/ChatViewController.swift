@@ -10,6 +10,9 @@ import UIKit
 
 let kChatCellReuseableID = "chatTableViewCell"
 
+
+
+
 class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     // MARK: - Outlets
     
@@ -43,6 +46,16 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = nameOfUser
+        let userDefaultes = UserDefaults.standard
+        if let bufArrayOfSenders = userDefaultes.object(forKey: self.title! + "Senders") as? [String], let bufArrayOfData = userDefaultes.data(forKey: self.title! + "Messages") {
+            let bufArrayOfMessage = NSKeyedUnarchiver.unarchiveObject(with: bufArrayOfData) as! [Message]
+            for index in (0 ..< bufArrayOfSenders.count) {
+                messageFullArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index])]
+            }
+        }
+        //var tmpArrayOfSenders = [String]()
+        //var tmpArryaOfMessage = [Message]()
+        
         messengerInstance.registerObserver { (string, message, messageStatus) in
             if let userID = string {
                 if userID == self.nameOfUser {
@@ -134,27 +147,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kChatCellReuseableID, for: indexPath) as! ChatTableViewCell
-//        switch flagFromWhom {
-//        case 0: cell.lableFromWhomMessenge.text = "To:"
-//        switch(flagStatus) {
-//            case 1:
-//                cell.imageViewStatus.image = imageSendingMail
-//            case 2:
-//                cell.imageViewStatus.image = imageSentMail
-//            case 3:
-//                cell.imageViewStatus.image = imageFailedMail
-//            case 4:
-//                cell.imageViewStatus.image = imageDeliveredMail
-//            case 5:
-//                cell.imageViewStatus.image = imageReadMail
-//            default:
-//                break
-//            }
-//        case 1: cell.lableFromWhomMessenge.text = "From:"
-//            cell.imageViewStatus.image = nil
-//        default:
-//            break
-//        }
+
         if (messageFullArray[indexPath.row].0 == loginUserID){
             cell.lableFromWhomMessenge.text = "To:"
             cell.backgroundColor = UIColor.white
@@ -172,7 +165,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
                     default:
                         break
                     }
-        } else {
+        } else if (messageFullArray[indexPath.row].0 == nameOfUser) {
             cell.lableFromWhomMessenge.text = "From:"
             cell.imageViewStatus.image = nil
             cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
@@ -205,6 +198,23 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     override func viewWillDisappear(_ animated: Bool) {
         constraintBottomTableView.constant -= keyboardHeight
+        
+        var bufArrayOfSenders = [String]()
+        var bufArrayOfMessages = [Message]()
+        
+        for (user,message) in messageFullArray {
+            bufArrayOfSenders = [user] + bufArrayOfSenders
+            bufArrayOfMessages = [message] + bufArrayOfMessages
+        }
+        let userDefaultes = UserDefaults.standard
+        userDefaultes.set(bufArrayOfSenders, forKey: self.title! + "Senders")
+        let data = NSKeyedArchiver.archivedData(withRootObject: bufArrayOfMessages)
+        userDefaultes.set(data, forKey: self.title! + "Messages")
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        
     }
 
 }

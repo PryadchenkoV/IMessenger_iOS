@@ -13,6 +13,21 @@
 
 @implementation MessageContentObjC
 
+- (id)initWithCoder:(NSCoder *)decoder {
+    if (self = [super init]) {
+        self.data = [decoder decodeObjectForKey:@"data"];
+        self.encrypted = [decoder decodeBoolForKey:@"encrypted"];
+        self.type = messageContentType([decoder decodeIntegerForKey:@"type"]);
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject: self.data forKey: @"data"];
+    [encoder encodeBool: self.encrypted forKey: @"encrypted"];
+    [encoder encodeInteger: self.type forKey: @"type"];
+}
+
 - (instancetype)init
 {
     self = [super init];
@@ -28,6 +43,21 @@
 #pragma mark - Message
 
 @implementation Message
+
+- (id)initWithCoder:(NSCoder *)decoder {
+    if (self = [super init]) {
+        self.identifier = [decoder decodeObjectForKey:@"identifier"];
+        self.date = [decoder decodeObjectForKey:@"date"];
+        self.content = [decoder decodeObjectForKey:@"content"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)encoder {
+    [encoder encodeObject:self.identifier forKey:@"identifier"];
+    [encoder encodeObject:self.date forKey:@"date"];
+    [encoder encodeObject:self.content forKey:@"content"];
+}
 
 - (instancetype)init
 {

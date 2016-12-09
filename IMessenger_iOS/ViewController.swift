@@ -50,16 +50,19 @@ class ViewController: UIViewController {
                 DispatchQueue.main.async {
                     self.createAlertView(stringToPresent: "Authentification Error")
                 }
+                self.activityIndicator.stopAnimating()
                 print("AuthError")
             case InternalError:
                 DispatchQueue.main.async {
                     self.createAlertView(stringToPresent: "Internal Error")
                 }
+                self.activityIndicator.stopAnimating()
                 print("InternalError")
             case NetworkError:
                 DispatchQueue.main.async {
                     self.createAlertView(stringToPresent: "Network Error")
                 }
+                self.activityIndicator.stopAnimating()
                 print("NetworkError")
             default:
                 print("Default")
