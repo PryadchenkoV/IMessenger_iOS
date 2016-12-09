@@ -135,7 +135,7 @@ public:
     self = [super init];
     if (self) {
         messenger::MessengerSettings messengerSettingsStruct;
-        //messengerSettingsStruct.serverUrl = "172.20.10.3";
+        messengerSettingsStruct.serverUrl = "192.168.0.103";
         m_IMessenger = messenger::GetMessengerInstance(messengerSettingsStruct);
     }
     return self;

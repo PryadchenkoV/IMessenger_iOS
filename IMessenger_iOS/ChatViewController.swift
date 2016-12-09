@@ -40,18 +40,16 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     var tmpDictionary = [String:Any]()
     
-    var flagStatus = -1
-    
     // MARK: - Base Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.title = nameOfUser
         let userDefaultes = UserDefaults.standard
-        if let bufArrayOfSenders = userDefaultes.object(forKey: self.title! + "Senders") as? [String], let bufArrayOfData = userDefaultes.data(forKey: self.title! + "Messages") {
+        if let bufArrayOfSenders = userDefaultes.object(forKey: self.title! + "Senders") as? [String], let bufArrayOfData = userDefaultes.data(forKey: self.title! + "Messages"), let bufArrayOfStatuses = userDefaultes.object(forKey: self.title! + "Statuses") as? [String]{
             let bufArrayOfMessage = NSKeyedUnarchiver.unarchiveObject(with: bufArrayOfData) as! [Message]
             for index in (0 ..< bufArrayOfSenders.count) {
-                messageFullArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index])]
+                messageArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index],bufArrayOfStatuses[index])]
             }
         }
     
@@ -72,55 +70,27 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         let userInfo = notification.userInfo! as NSDictionary
         if userInfo["Sender"] as! String == self.nameOfUser {
             let message = userInfo["Message"] as! Message
-            self.messageFullArray = [(self.title!, message)] + self.messageFullArray
-            self.messageArray = [(self.title!,message,"None")] + self.messageArray
+            self.messageArray = [(self.nameOfUser,message,"None")] + self.messageArray
             DispatchQueue.main.async {
                 self.tableViewChat.beginUpdates()
                 self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .right)
-                if self.messageFullArray.count > 1{
+                if self.messageArray.count > 1{
                     self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
                 }
                 self.tableViewChat.endUpdates()
             }
 
+
         }
     }
     
-    func onStatusChanged(notification: NSNotification) {
+   func onStatusChanged(notification: NSNotification) {
         let userInfo = notification.userInfo! as NSDictionary
         let messageID = userInfo["MessageID"] as! String
         let statusOfMessage = userInfo["Status"] as! String
-        var indexCount = -1
-        for (_,messageInArray) in self.messageFullArray {
-            indexCount += 1
-            if messageInArray.identifier == messageID {
-                
-                let indexOfMessage = indexCount
-                DispatchQueue.main.async {
-                    switch(statusOfMessage) {
-                    case "Sending":
-                        self.flagStatus = 1
-                    case "Sent":
-                        self.flagStatus = 2
-                    case "FailedToSend":
-                        self.flagStatus = 3
-                    case "Delivered":
-                        self.flagStatus = 4
-                    case "Seen":
-                        self.flagStatus = 5
-                    default:
-                        break
-                    }
-                    self.tableViewChat.beginUpdates()
-                    self.tableViewChat.reloadRows(at: [IndexPath.init(row: indexOfMessage, section: 0)], with: .none)
-                    self.tableViewChat.endUpdates()
-                }
-            }
-        }
-        
         //New
         for indexCountInArray in (0..<self.messageArray.count){
-            if messageArray[indexCountInArray].0 == messageID {
+            if messageArray[indexCountInArray].1.identifier == messageID {
                 messageArray[indexCountInArray].2 = statusOfMessage
                 let indexOfMessage = indexCountInArray
                 DispatchQueue.main.async {
@@ -132,7 +102,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             }
         }
         
-    }
+   }
 
     
     deinit {
@@ -155,45 +125,45 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        if messageFullArray[indexPath.row].0 == self.title! {
+        if messageArray[indexPath.row].0 == self.title! {
             DispatchQueue.main.async {
-                
-                messengerInstance.sentMessageSeen(withId: self.messageFullArray[indexPath.row].1.identifier, fromUser: self.title)
+                messengerInstance.sentMessageSeen(withId: self.messageArray[indexPath.row].1.identifier, fromUser: self.title)
             }
         }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return messageFullArray.count
+        return messageArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: kChatCellReuseableID, for: indexPath) as! ChatTableViewCell
 
-        if (messageFullArray[indexPath.row].0 == loginUserID){
+        if (messageArray[indexPath.row].0 == loginUserID){
             cell.lableFromWhomMessenge.text = "To:"
             cell.backgroundColor = UIColor.white
-                switch(flagStatus) {
-                    case 1:
+                switch(messageArray[indexPath.row].2) {
+                    case "Sending":
                         cell.imageViewStatus.image = imageSendingMail
-                    case 2:
+                    case "Sent":
                         cell.imageViewStatus.image = imageSentMail
-                    case 3:
+                    case "FailedToSend":
                         cell.imageViewStatus.image = imageFailedMail
-                    case 4:
+                    case "Delivered":
                         cell.imageViewStatus.image = imageDeliveredMail
-                    case 5:
+                    case "Seen":
                         cell.imageViewStatus.image = imageReadMail
+                    case "None":
+                        cell.imageViewStatus.image = nil
                     default:
                         break
                     }
-        } else if (messageFullArray[indexPath.row].0 == nameOfUser) {
+        } else if (messageArray[indexPath.row].0 == nameOfUser) {
             cell.lableFromWhomMessenge.text = "From:"
             cell.imageViewStatus.image = nil
             cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
         }
-        cell.chatLable.text = messageFullArray[indexPath.row].1.content.data
-        //cell.chatLable.text = messengesArray[indexPath.row].content.data
+        cell.chatLable.text = messageArray[indexPath.row].1.content.data
         return cell
     }
     
@@ -205,14 +175,12 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         messageContentInstance?.type = Text
         messageContentInstance?.data = textFieldChat.text
         textFieldChat.text = ""
-        let messengeSend = messengerInstance.sendMessage(toUser: nameOfUser, messageContent: messageContentInstance)
-        messageFullArray = [(loginUserID, messengeSend!)] + messageFullArray
-        //messengesArray = [(messengeSend)!] + messengesArray
-        //tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+        let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+        self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
         self.tableViewChat.beginUpdates()
         self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
-        if messageFullArray.count > 1{
-            tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+        if self.messageArray.count > 1{
+            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
         }
         self.tableViewChat.endUpdates()
     }
@@ -222,28 +190,23 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         var bufArrayOfSenders = [String]()
         var bufArrayOfMessages = [Message]()
         var bufArrayOfStatuses = [String]()
-        
-        for (user,message) in messageFullArray {
+        var counterForHistory = 0
+        for(user,message,status) in messageArray {
+            counterForHistory += 1
+            if(counterForHistory > 100) {
+                break
+            }
             bufArrayOfSenders += [user]
             bufArrayOfMessages += [message]
+            bufArrayOfStatuses += [status]
         }
         
-//        for(user,message,status) in messageArray {
-//            bufArrayOfSenders += [user]
-//            bufArrayOfMessages += [message]
-//            bufArrayOfStatuses += [status]
-//        }
-//        
         let userDefaultes = UserDefaults.standard
         userDefaultes.set(bufArrayOfSenders, forKey: self.title! + "Senders")
         let data = NSKeyedArchiver.archivedData(withRootObject: bufArrayOfMessages)
         userDefaultes.set(data, forKey: self.title! + "Messages")
         userDefaultes.set(bufArrayOfStatuses, forKey: self.title! + "Statuses")
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        
-    }
+
 
 }
