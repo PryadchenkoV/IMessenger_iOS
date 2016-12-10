@@ -17,7 +17,7 @@
 		E2169CE91DF7404700284F29 /* delivered100.png in Resources */ = {isa = PBXBuildFile; fileRef = E2169CE81DF7404700284F29 /* delivered100.png */; };
 		E2169CEB1DF7416200284F29 /* read100.png in Resources */ = {isa = PBXBuildFile; fileRef = E2169CEA1DF7416200284F29 /* read100.png */; };
 		E2169CEE1DF75FC000284F29 /* ObserversObjC.mm in Sources */ = {isa = PBXBuildFile; fileRef = E2169CED1DF75FC000284F29 /* ObserversObjC.mm */; };
-		E22D86591DFB6865009B73E9 /* SoundForNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = E22D86581DFB6864009B73E9 /* SoundForNotification.swift */; };
+		E22D865B1DFB70BB009B73E9 /* ImageTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = E22D865A1DFB70BB009B73E9 /* ImageTableViewCell.swift */; };
 		E26248D51DEC88DD00076DD1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D41DEC88DD00076DD1 /* AppDelegate.swift */; };
 		E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26248D61DEC88DD00076DD1 /* ViewController.swift */; };
 		E26248DA1DEC88DD00076DD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E26248D81DEC88DD00076DD1 /* Main.storyboard */; };
@@ -42,7 +42,7 @@
 		E2169CEA1DF7416200284F29 /* read100.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = read100.png; path = ../../../Downloads/read100.png; sourceTree = "<group>"; };
 		E2169CEC1DF75FC000284F29 /* ObserversObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObserversObjC.h; sourceTree = "<group>"; };
 		E2169CED1DF75FC000284F29 /* ObserversObjC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObserversObjC.mm; sourceTree = "<group>"; };
-		E22D86581DFB6864009B73E9 /* SoundForNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundForNotification.swift; sourceTree = "<group>"; };
+		E22D865A1DFB70BB009B73E9 /* ImageTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageTableViewCell.swift; sourceTree = "<group>"; };
 		E26248D11DEC88DD00076DD1 /* IMessenger_iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IMessenger_iOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E26248D41DEC88DD00076DD1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E26248D61DEC88DD00076DD1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -115,8 +115,8 @@
 				E26248F61DEC8E7000076DD1 /* ObjC */,
 				E26248D41DEC88DD00076DD1 /* AppDelegate.swift */,
 				E26248D61DEC88DD00076DD1 /* ViewController.swift */,
-				E22D86581DFB6864009B73E9 /* SoundForNotification.swift */,
 				E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */,
+				E22D865A1DFB70BB009B73E9 /* ImageTableViewCell.swift */,
 				E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */,
 				E2169CDD1DF4B15800284F29 /* ChatViewController.swift */,
 				E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */,
@@ -254,7 +254,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				E26248D71DEC88DD00076DD1 /* ViewController.swift in Sources */,
-				E22D86591DFB6865009B73E9 /* SoundForNotification.swift in Sources */,
 				E26248F51DEC8E6A00076DD1 /* MessengerObjC.mm in Sources */,
 				E2169CDE1DF4B15800284F29 /* ChatViewController.swift in Sources */,
 				E2169CEE1DF75FC000284F29 /* ObserversObjC.mm in Sources */,
@@ -262,6 +261,7 @@
 				E2169CDC1DF4415900284F29 /* ActiveUserTableViewCell.swift in Sources */,
 				E2B977711DED6020001551BC /* TypesObjC.mm in Sources */,
 				E26248D51DEC88DD00076DD1 /* AppDelegate.swift in Sources */,
+				E22D865B1DFB70BB009B73E9 /* ImageTableViewCell.swift in Sources */,
 				E2AA44DB1DEDCB00004BAC9B /* SettingsObjC.mm in Sources */,
 				E2169CDA1DF43EE600284F29 /* ActiveUsersViewController.swift in Sources */,
 			);

@@ -9,14 +9,15 @@
 import UIKit
 
 let kChatCellReuseableID = "chatTableViewCell"
+let kImageCellReuseableID = "cellForImage"
 
 
 
-
-class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet weak var barButtonClearHistory: UIBarButtonItem!
     // MARK: - Outlets
     
+    @IBOutlet weak var buttonAddContent: UIButton!
     @IBOutlet weak var textFieldChat: UITextField!
     @IBOutlet weak var tableViewChat: UITableView!
     @IBOutlet weak var buttonSend: UIButton!
@@ -53,7 +54,8 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
                 messageArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index],bufArrayOfStatuses[index])]
             }
         }
-    
+        let picker = UIImagePickerController()
+        picker.delegate = self
         textFieldChat.delegate = self
         tableViewChat.delegate = self
         tableViewChat.dataSource = self
@@ -138,34 +140,65 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: kChatCellReuseableID, for: indexPath) as! ChatTableViewCell
-
-        if (messageArray[indexPath.row].0 == loginUserID){
-            cell.lableFromWhomMessenge.text = "To:"
-            cell.backgroundColor = UIColor.white
+        if messageArray[indexPath.row].1.content.type == Text {
+            let cell = tableView.dequeueReusableCell(withIdentifier: kChatCellReuseableID, for: indexPath) as! ChatTableViewCell
+            if (messageArray[indexPath.row].0 == loginUserID){
+                cell.lableFromWhomMessenge.text = "To:"
+                cell.backgroundColor = UIColor.white
                 switch(messageArray[indexPath.row].2) {
-                    case "Sending":
-                        cell.imageViewStatus.image = imageSendingMail
-                    case "Sent":
-                        cell.imageViewStatus.image = imageSentMail
-                    case "FailedToSend":
-                        cell.imageViewStatus.image = imageFailedMail
-                    case "Delivered":
-                        cell.imageViewStatus.image = imageDeliveredMail
-                    case "Seen":
-                        cell.imageViewStatus.image = imageReadMail
-                    case "None":
-                        cell.imageViewStatus.image = nil
-                    default:
-                        break
-                    }
-        } else if (messageArray[indexPath.row].0 == nameOfUser) {
-            cell.lableFromWhomMessenge.text = "From:"
-            cell.imageViewStatus.image = nil
-            cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
+                case "Sending":
+                    cell.imageViewStatus.image = imageSendingMail
+                case "Sent":
+                    cell.imageViewStatus.image = imageSentMail
+                case "FailedToSend":
+                    cell.imageViewStatus.image = imageFailedMail
+                case "Delivered":
+                    cell.imageViewStatus.image = imageDeliveredMail
+                case "Seen":
+                    cell.imageViewStatus.image = imageReadMail
+                case "None":
+                    cell.imageViewStatus.image = nil
+                default:
+                    break
+                }
+            } else if (messageArray[indexPath.row].0 == nameOfUser) {
+                cell.lableFromWhomMessenge.text = "From:"
+                cell.imageViewStatus.image = nil
+                cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
+            }
+            cell.chatLable.text = messageArray[indexPath.row].1.content.data
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: kImageCellReuseableID, for: indexPath) as! ImageTableViewCell
+            if (messageArray[indexPath.row].0 == loginUserID){
+                cell.lableFromWhomMessenge.text = "To:"
+                cell.backgroundColor = UIColor.white
+                switch(messageArray[indexPath.row].2) {
+                case "Sending":
+                    cell.imageViewStatus.image = imageSendingMail
+                case "Sent":
+                    cell.imageViewStatus.image = imageSentMail
+                case "FailedToSend":
+                    cell.imageViewStatus.image = imageFailedMail
+                case "Delivered":
+                    cell.imageViewStatus.image = imageDeliveredMail
+                case "Seen":
+                    cell.imageViewStatus.image = imageReadMail
+                case "None":
+                    cell.imageViewStatus.image = nil
+                default:
+                    break
+                }
+            } else if (messageArray[indexPath.row].0 == nameOfUser) {
+                cell.lableFromWhomMessenge.text = "From:"
+                cell.imageViewStatus.image = nil
+                cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
+            }
+            let data = Data(base64Encoded: messageArray[indexPath.row].1.content.data, options: NSData.Base64DecodingOptions.ignoreUnknownCharacters);
+            let someImage = UIImage(data: data!);
+            cell.imageViewTransferedPic.image = someImage
+            return cell
         }
-        cell.chatLable.text = messageArray[indexPath.row].1.content.data
-        return cell
     }
     
     // MARK: - IBActions
@@ -184,6 +217,83 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
         }
         self.tableViewChat.endUpdates()
+    }
+    
+    @IBAction func buttonAddContentPushed(_ sender: UIButton) {
+//        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
+//            let imagePicker = UIImagePickerController()
+//            imagePicker.delegate = self
+//            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
+//            imagePicker.allowsEditing = true
+//            self.present(imagePicker, animated: true, completion: nil)
+//        }
+//        
+        let alertController = UIAlertController(title: nil, message: "What content do you want to add?", preferredStyle: .actionSheet)
+        
+        let cameraAction = UIAlertAction(title: "Camera", style: .default) { (action) in
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
+                let imagePicker = UIImagePickerController()
+                imagePicker.delegate = self
+                imagePicker.sourceType = UIImagePickerControllerSourceType.camera;
+                imagePicker.allowsEditing = true
+                self.present(imagePicker, animated: true, completion: nil)
+            }
+        }
+        alertController.addAction(cameraAction)
+        let libraryAction = UIAlertAction(title: "Library", style: .default) { (action) in
+            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
+            imagePicker.allowsEditing = true
+            self.present(imagePicker, animated: true, completion: nil)
+            }
+        }
+        alertController.addAction(libraryAction)
+        self.present(alertController, animated: true) {
+        }
+
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        let chosenImage = info[UIImagePickerControllerOriginalImage] as! UIImage 
+        let dataToSave = UIImagePNGRepresentation(chosenImage)
+        let dataToSaveString = String(data: dataToSave!, encoding: String.Encoding.utf8)
+        let strBase64 = dataToSave?.base64EncodedString()
+        let messageContentInstance = MessageContentObjC()
+        messageContentInstance?.encrypted = false
+        messageContentInstance?.type = Image
+        messageContentInstance?.data = strBase64
+        
+        let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+        self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
+        self.tableViewChat.beginUpdates()
+        self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+        if self.messageArray.count > 1{
+            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+        }
+        self.tableViewChat.endUpdates()
+        dismiss(animated: true, completion: nil)
+    }
+
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+        let dataToSave = UIImagePNGRepresentation(image)
+        let dataToSaveString = String(data: dataToSave!, encoding: String.Encoding.utf8)
+        let messageContentInstance = MessageContentObjC()
+        messageContentInstance?.encrypted = false
+        messageContentInstance?.type = Image
+        messageContentInstance?.data = dataToSaveString
+
+        let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+        self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
+        self.tableViewChat.beginUpdates()
+        self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+        if self.messageArray.count > 1{
+            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+        }
+        self.tableViewChat.endUpdates()
+        self.dismiss(animated: true, completion: nil);
     }
     
     override func viewWillDisappear(_ animated: Bool) {

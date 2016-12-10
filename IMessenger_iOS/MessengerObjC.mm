@@ -256,37 +256,29 @@ public:
     
     
     std::string dataFormNSString = std::string([message.data UTF8String]);
-    std::vector<unsigned char> vectorData;
-    for (std::string::iterator it = dataFormNSString.begin() ; it < dataFormNSString.end(); ++it) {
-        vectorData.push_back(*it);
-
+    std::vector<unsigned char> vectorData(dataFormNSString.begin(),dataFormNSString.end()) ;
+//    for (std::string::iterator it = std::string([message.data UTF8String]).begin() ; it < std::string([message.data UTF8String]).end(); ++it) {
+//        vectorData.push_back(*it);
+//
+//    }
+    switch (message.type) {
+        case Text:
+            messageContent.type = messenger::message_content_type::Text;
+            break;
+        case Image:
+            messageContent.type = messenger::message_content_type::Image;
+            break;
+        case Video:
+            messageContent.type = messenger::message_content_type::Video;
+            break;
+        default:
+            break;
     }
     messageContent.data = vectorData;
     
     messenger::Message sentMessageC = m_IMessenger->SendMessage(std::string([user UTF8String]).c_str(), messageContent);
     Message* sentMessageObjC = [[Message alloc]init];
-    sentMessageObjC = [self convertCMessageToObj: sentMessageC];
-//    sentMessageObjC.identifier = [NSString stringWithUTF8String:sentMessageC.identifier.c_str()];
-//    sentMessageObjC.date = [NSDate dateWithTimeIntervalSince1970:sentMessageC.time];
-//    
-//    MessageContentObjC* tmpContent = [[MessageContentObjC alloc]init];
-//    tmpContent.encrypted = sentMessageC.content.encrypted;
-//    switch (sentMessageC.content.type) {
-//        case messenger::message_content_type::Text:
-//            tmpContent.type = Text;
-//            break;
-//        case messenger::message_content_type::Image:
-//            tmpContent.type = Image;
-//            break;
-//        case messenger::message_content_type::Video:
-//            tmpContent.type = Video;
-//            break;
-//        default:
-//            break;
-//    }
-//    tmpContent.data = message.data;
-//    sentMessageObjC.content = tmpContent;
-//    
+    sentMessageObjC = [self convertCMessageToObj: sentMessageC]; 
     return sentMessageObjC;
 }
 
