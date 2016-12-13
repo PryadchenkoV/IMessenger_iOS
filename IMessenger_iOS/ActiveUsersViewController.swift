@@ -12,9 +12,12 @@ import AVFoundation
 
 let kSystemSoundIDForNotifications: SystemSoundID = 1016
 let kCellActiveUserReusedID = "cellActiveUser"
+let kCellForTableViewEstimateHeight = CGFloat(44.0)
 
 class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
+    // MARK: - Var and let
+    
     @IBOutlet weak var tableViewActiveUsers: UITableView!
     
     @IBOutlet weak var barButtonDisconnect: UIBarButtonItem!
@@ -22,20 +25,31 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var lableUserID: UILabel!
     @IBOutlet weak var barButtonRefresh: UIBarButtonItem!
+    
+    // MARK: - Var and let
+    
     var userName = ""
     var arrayOfUsers = [String]()
     var messageArray = [(String,Message,String)]()
     var flagNewMessage = false
     var tmpDictionary = [String:Any]()
     
+    var loginUserID = ""
+    
+    // MARK: - Basic Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let userDefaultes = UserDefaults.standard
+        if let bufLogin = userDefaultes.object(forKey: "Login") as? String {
+            loginUserID = bufLogin
+        }
         lableUserID.text = loginUserID
         tableViewActiveUsers.delegate = self
         tableViewActiveUsers.dataSource = self
-        tableViewActiveUsers.estimatedRowHeight = 44.0
+        tableViewActiveUsers.estimatedRowHeight = kCellForTableViewEstimateHeight
         tableViewActiveUsers.rowHeight = UITableViewAutomaticDimension
+        let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
         messengerInstance.requestActiveUsers { (operationResult, arrayOfUsers) in
             switch operationResult {
             case Ok:
@@ -47,19 +61,16 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
                 DispatchQueue.main.async {
                     self.createAlertView(stringToPresent: "Authentification Error")
                 }
-                print("AuthError")
             case InternalError:
                 DispatchQueue.main.async {
                     self.createAlertView(stringToPresent: "Internal Error")
                 }
-                print("InternalError")
             case NetworkError:
                 DispatchQueue.main.async {
                     self.createAlertView(stringToPresent: "Network Error")
                 }
-                print("NetworkError")
             default:
-                print("Default")
+                break
             }
             
         }
@@ -68,6 +79,13 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
 
         
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    
+    // MARK: - Notification
     
     func onMessageReceived(notification:Notification) {
         AudioServicesPlaySystemSound(kSystemSoundIDForNotifications)
@@ -86,12 +104,15 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             self.tableViewActiveUsers.beginUpdates()
             self.tableViewActiveUsers.reloadRows(at: [IndexPath.init(row: indexOfUser, section: 0)], with: .none)
             self.tableViewActiveUsers.endUpdates()
+            if self.messageArray.count > 1{
+                self.tableViewActiveUsers.scrollToRow(at: IndexPath.init(row: indexOfUser, section: 0), at: .top, animated: true)
+            }
         }
     }
     
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
+    
+    
+    // MARK: - TableView Methods
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return arrayOfUsers.count
@@ -135,8 +156,11 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
             self.tableViewActiveUsers.endUpdates()
         }
     }
+    
+    // MARK: - Addition Func
 
     @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
+        let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
         switch sender{
         case barButtonDisconnect:
             messengerInstance.disconnectFromServer()
@@ -193,6 +217,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func createAlertView(stringToPresent:String) {
+        let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
         let alertController = UIAlertController(title: "Try again", message: stringToPresent, preferredStyle: .alert)
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { (action) in
@@ -246,14 +271,5 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
         }
         tableViewActiveUsers.reloadData()
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

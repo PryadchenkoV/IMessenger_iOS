@@ -85,6 +85,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E20982711E0001E700818921 /* TableCells */ = {
+			isa = PBXGroup;
+			children = (
+				E2A642531DFC8DE3008BA2A8 /* VideoTableViewCell.swift */,
+				E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */,
+				E22D865A1DFB70BB009B73E9 /* ImageTableViewCell.swift */,
+				E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */,
+			);
+			name = TableCells;
+			sourceTree = "<group>";
+		};
 		E2169CE71DF73F2400284F29 /* icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -122,13 +133,10 @@
 				E26248D41DEC88DD00076DD1 /* AppDelegate.swift */,
 				E26248D61DEC88DD00076DD1 /* ViewController.swift */,
 				E2169CD91DF43EE600284F29 /* ActiveUsersViewController.swift */,
-				E2A642551DFC915C008BA2A8 /* VideoFromMessageAVViewController.swift */,
-				E22D865A1DFB70BB009B73E9 /* ImageTableViewCell.swift */,
-				E2169CDB1DF4415900284F29 /* ActiveUserTableViewCell.swift */,
-				E209826F1DFFF0C100818921 /* DetailedPhotoViewController.swift */,
 				E2169CDD1DF4B15800284F29 /* ChatViewController.swift */,
-				E2A642531DFC8DE3008BA2A8 /* VideoTableViewCell.swift */,
-				E2169CDF1DF4B36C00284F29 /* ChatTableViewCell.swift */,
+				E2A642551DFC915C008BA2A8 /* VideoFromMessageAVViewController.swift */,
+				E209826F1DFFF0C100818921 /* DetailedPhotoViewController.swift */,
+				E20982711E0001E700818921 /* TableCells */,
 				E26248D81DEC88DD00076DD1 /* Main.storyboard */,
 				E26248DB1DEC88DD00076DD1 /* Assets.xcassets */,
 				E26248DD1DEC88DD00076DD1 /* LaunchScreen.storyboard */,

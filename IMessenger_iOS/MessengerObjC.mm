@@ -130,11 +130,22 @@ public:
 @end
 
 @implementation MessengerObjC
+
++(id)sharedManager {
+    static MessengerObjC *sharedMyManager = nil;
+    @synchronized(self) {
+        if (sharedMyManager == nil)
+            sharedMyManager = [[self alloc] init];
+    }
+    return sharedMyManager;
+}
+
 - (instancetype)init
 {
     self = [super init];
     if (self) {
         messenger::MessengerSettings messengerSettingsStruct;
+        messengerSettingsStruct.serverUrl = "192.168.0.100";
         //messengerSettingsStruct.serverUrl = "195.123.211.113";
         m_IMessenger = messenger::GetMessengerInstance(messengerSettingsStruct);
     }
@@ -253,14 +264,9 @@ public:
 
 -(Message*)sendMessageToUser:(NSString*)user messageContent:(MessageContentObjC*)message {
     messenger::MessageContent messageContent = *new messenger::MessageContent;
-    
-    
+
     std::string dataFormNSString = std::string([message.data UTF8String]);
     std::vector<unsigned char> vectorData(dataFormNSString.begin(),dataFormNSString.end()) ;
-//    for (std::string::iterator it = std::string([message.data UTF8String]).begin() ; it < std::string([message.data UTF8String]).end(); ++it) {
-//        vectorData.push_back(*it);
-//
-//    }
     switch (message.type) {
         case Text:
             messageContent.type = messenger::message_content_type::Text;

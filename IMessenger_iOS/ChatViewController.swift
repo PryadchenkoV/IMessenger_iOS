@@ -8,7 +8,6 @@
 
 import UIKit
 import AVKit
-import AVFoundation
 import MobileCoreServices
 
 let kChatCellReuseableID = "chatTableViewCell"
@@ -16,24 +15,24 @@ let kImageCellReuseableID = "cellForImage"
 let kVideoCellReuseableID = "cellWithVideo"
 let kSegueFromChatToVideo = "fromChatToVideo"
 let kSegueFromChatToDetailedPhoto = "fromChatToDetailedPhoto"
+let kNumberOfMessagesSavedToHistory = 100
 
 
 class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    @IBOutlet weak var barButtonClearHistory: UIBarButtonItem!
-    // MARK: - Outlets
+        // MARK: - Outlets
     
+    @IBOutlet weak var barButtonClearHistory: UIBarButtonItem!
     @IBOutlet weak var buttonAddContent: UIButton!
     @IBOutlet weak var textFieldChat: UITextField!
     @IBOutlet weak var tableViewChat: UITableView!
     @IBOutlet weak var buttonSend: UIButton!
-    
     @IBOutlet weak var constraintBottomTableView: NSLayoutConstraint!
     
     // MARK: - Var and let
     
 
-    var urlVideo:URL?
-    var messageFullArray = [(String,Message)]()
+    var loginUserID = ""
+    
     var messageArray = [(String,Message,String)]()
     
     
@@ -47,7 +46,6 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     let imageFailedMail = UIImage(named: "failed100")
     let imageSendingMail = UIImage(named: "sending100")
     
-    var tmpDictionary = [String:Any]()
     
     // MARK: - Base Methods
     
@@ -55,19 +53,24 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         super.viewDidLoad()
         self.title = nameOfUser
         let userDefaultes = UserDefaults.standard
+        if let bufLogin = userDefaultes.object(forKey: "Login") as? String {
+            loginUserID = bufLogin
+        }
         if let bufArrayOfSenders = userDefaultes.object(forKey: loginUserID + self.title! + "Senders") as? [String], let bufArrayOfData = userDefaultes.data(forKey: loginUserID + self.title! + "Messages"), let bufArrayOfStatuses = userDefaultes.object(forKey: loginUserID + self.title! + "Statuses") as? [String]{
             let bufArrayOfMessage = NSKeyedUnarchiver.unarchiveObject(with: bufArrayOfData) as! [Message]
             for index in (0 ..< bufArrayOfSenders.count) {
                 messageArray += [(bufArrayOfSenders[index],bufArrayOfMessage[index],bufArrayOfStatuses[index])]
             }
         }
+        
         let picker = UIImagePickerController()
         picker.delegate = self
         textFieldChat.delegate = self
         tableViewChat.delegate = self
         tableViewChat.dataSource = self
-        tableViewChat.estimatedRowHeight = 44.0
+        tableViewChat.estimatedRowHeight = kCellForTableViewEstimateHeight
         tableViewChat.rowHeight = UITableViewAutomaticDimension
+        let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
         messengerInstance.registerObserver()
         NotificationCenter.default.addObserver(self, selector: #selector(self.onMessageReceived), name: NSNotification.Name(rawValue: kNSNotificationOnMessageReceived), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.onStatusChanged),name: NSNotification.Name(rawValue: kNSkNSNotificationOnMessageStatusChanged), object: nil)
@@ -75,6 +78,36 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
 
     }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        constraintBottomTableView.constant -= keyboardHeight
+        var bufArrayOfSenders = [String]()
+        var bufArrayOfMessages = [Message]()
+        var bufArrayOfStatuses = [String]()
+        var counterForHistory = 0
+        for(user,message,status) in messageArray {
+            counterForHistory += 1
+            if(counterForHistory > kNumberOfMessagesSavedToHistory) {
+                break
+            }
+            bufArrayOfSenders += [user]
+            bufArrayOfMessages += [message]
+            bufArrayOfStatuses += [status]
+        }
+        
+        let userDefaultes = UserDefaults.standard
+        userDefaultes.set(bufArrayOfSenders, forKey: loginUserID + self.title! + "Senders")
+        let data = NSKeyedArchiver.archivedData(withRootObject: bufArrayOfMessages)
+        userDefaultes.set(data, forKey: loginUserID + self.title! + "Messages")
+        userDefaultes.set(bufArrayOfStatuses, forKey: loginUserID + self.title! + "Statuses")
+    }
+    
+    
+    // MARK: - Notification
     
     func onMessageReceived(notification: NSNotification) {
         let userInfo = notification.userInfo! as NSDictionary
@@ -114,11 +147,6 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         
    }
 
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self)
-    }
-
     func keyboardWillShow(notification: NSNotification) {
         let userInfo:NSDictionary = notification.userInfo! as NSDictionary
         let keyboardFrame:NSValue = userInfo.value(forKey: UIKeyboardFrameEndUserInfoKey) as! NSValue
@@ -134,6 +162,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     // MARK: - TableView Methods
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
         tableView.deselectRow(at: indexPath, animated: true)
         if messageArray[indexPath.row].0 == self.title! {
             DispatchQueue.main.async {
@@ -149,26 +178,12 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == kSegueFromChatToVideo {
-            if let destinantionController = segue.destination as? VideoFromMessageAVViewController {
-
-                destinantionController.messageToPlay = [messageArray[numberOfRow].1]
-            }
-        }
-        if segue.identifier == kSegueFromChatToDetailedPhoto {
-            if let destinantionController = segue.destination as? DetailedPhotoViewController {
-                
-                destinantionController.messageRecieved = [(messageArray[numberOfRow].0,messageArray[numberOfRow].1)]
-            }
-        }
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return messageArray.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         if messageArray[indexPath.row].1.content.type == Text {
             let cell = tableView.dequeueReusableCell(withIdentifier: kChatCellReuseableID, for: indexPath) as! ChatTableViewCell
             if (messageArray[indexPath.row].0 == loginUserID){
@@ -182,6 +197,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             }
             cell.chatLable.text = messageArray[indexPath.row].1.content.data
             return cell
+            
         } else if messageArray[indexPath.row].1.content.type == Image {
             let cell = tableView.dequeueReusableCell(withIdentifier: kImageCellReuseableID, for: indexPath) as! ImageTableViewCell
             if (messageArray[indexPath.row].0 == loginUserID){
@@ -199,6 +215,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             let orientedImage = UIImage(cgImage: (someImage?.cgImage!)!, scale: 1, orientation: (someImage?.imageOrientation)!)
             cell.imageViewTransferedPic.image = orientedImage
             return cell
+            
         } else {
             let cell = tableView.dequeueReusableCell(withIdentifier: kVideoCellReuseableID, for: indexPath) as! VideoTableViewCell
             if (messageArray[indexPath.row].0 == loginUserID){
@@ -223,6 +240,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
         messageContentInstance?.type = Text
         messageContentInstance?.data = textFieldChat.text
         textFieldChat.text = ""
+        let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
         let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
         self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
         self.tableViewChat.beginUpdates()
@@ -234,14 +252,6 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     }
     
     @IBAction func buttonAddContentPushed(_ sender: UIButton) {
-//        if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
-//            let imagePicker = UIImagePickerController()
-//            imagePicker.delegate = self
-//            imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
-//            imagePicker.allowsEditing = true
-//            self.present(imagePicker, animated: true, completion: nil)
-//        }
-//        
         let alertController = UIAlertController(title: nil, message: "What content do you want to add?", preferredStyle: .actionSheet)
         
         let cameraAction = UIAlertAction(title: "Photo", style: .default) { (action) in
@@ -283,83 +293,6 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
 
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        if let chosenImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            let dataToSave = UIImagePNGRepresentation(chosenImage)
-            //let strBase64 = String(describing: dataToSave)
-            let strBase64 = dataToSave?.base64EncodedString()
-            let messageContentInstance = MessageContentObjC()
-            messageContentInstance?.encrypted = false
-            messageContentInstance?.type = Image
-            messageContentInstance?.data = strBase64
-            
-            let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
-            self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
-            self.tableViewChat.beginUpdates()
-            self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
-            if self.messageArray.count > 1{
-                self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
-            }
-            self.tableViewChat.endUpdates()
-        } else {
-            if let pickedVideo = (info[UIImagePickerControllerMediaURL] as? URL) {
-                urlVideo = pickedVideo
-                let messageContentInstance = MessageContentObjC()
-//                do {
-//                    let strBase64 = try String(contentsOf: pickedVideo)
-//                    let video = try Data(contentsOf: pickedVideo, options: Data.ReadingOptions())
-//                    let strBase64 = video.base64EncodedString()
-//                    messageContentInstance?.encrypted = false
-//                    messageContentInstance?.type = Video
-//                    messageContentInstance?.data = strBase64
-//                } catch {
-//                    print(error)
-//                }
-//                
-                let videoData = NSData(contentsOf: pickedVideo)
-                //let strNew = String(videoData)
-                let strBase64 = videoData?.base64EncodedData(options: NSData.Base64EncodingOptions.lineLength64Characters).base64EncodedString()
-                messageContentInstance?.encrypted = false
-                messageContentInstance?.type = Video
-                messageContentInstance?.data = strBase64
-                let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
-                self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
-                self.tableViewChat.beginUpdates()
-                self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
-                if self.messageArray.count > 1{
-                    self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
-                }
-                self.tableViewChat.endUpdates()
-                self.tableViewChat.reloadData()
-                
-            }
-        }
-        dismiss(animated: true, completion: nil)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        constraintBottomTableView.constant -= keyboardHeight
-        var bufArrayOfSenders = [String]()
-        var bufArrayOfMessages = [Message]()
-        var bufArrayOfStatuses = [String]()
-        var counterForHistory = 0
-        for(user,message,status) in messageArray {
-            counterForHistory += 1
-            if(counterForHistory > 100) {
-                break
-            }
-            bufArrayOfSenders += [user]
-            bufArrayOfMessages += [message]
-            bufArrayOfStatuses += [status]
-        }
-        
-        let userDefaultes = UserDefaults.standard
-        userDefaultes.set(bufArrayOfSenders, forKey: loginUserID + self.title! + "Senders")
-        let data = NSKeyedArchiver.archivedData(withRootObject: bufArrayOfMessages)
-        userDefaultes.set(data, forKey: loginUserID + self.title! + "Messages")
-        userDefaultes.set(bufArrayOfStatuses, forKey: loginUserID + self.title! + "Statuses")
-    }
-
     
     @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
         if sender == barButtonClearHistory {
@@ -378,6 +311,69 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             }
             alertController.addAction(cancelAction)
             self.present(alertController, animated: true) {
+            }
+        }
+    }
+    
+    // MARK: - Image Picker
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        if let chosenImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            let dataToSave = UIImagePNGRepresentation(chosenImage)
+            //let strBase64 = String(describing: dataToSave)
+            let strBase64 = dataToSave?.base64EncodedString()
+            let messageContentInstance = MessageContentObjC()
+            messageContentInstance?.encrypted = false
+            messageContentInstance?.type = Image
+            messageContentInstance?.data = strBase64
+            let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
+            let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+            self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
+            self.tableViewChat.beginUpdates()
+            self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+            if self.messageArray.count > 1{
+                self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+            }
+            self.tableViewChat.endUpdates()
+            
+        } else {
+            if let pickedVideo = (info[UIImagePickerControllerMediaURL] as? URL) {
+                let messageContentInstance = MessageContentObjC()
+                let videoData = NSData(contentsOf: pickedVideo)
+                //let strNew = String(videoData)
+                let strBase64 = videoData?.base64EncodedData(options: NSData.Base64EncodingOptions.lineLength64Characters).base64EncodedString()
+                messageContentInstance?.encrypted = false
+                messageContentInstance?.type = Video
+                messageContentInstance?.data = strBase64
+                let messengerInstance = MessengerObjC.sharedManager() as! MessengerObjC
+                let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+                self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
+                self.tableViewChat.beginUpdates()
+                self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+                if self.messageArray.count > 1{
+                    self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+                }
+                self.tableViewChat.endUpdates()
+                self.tableViewChat.reloadData()
+                
+            }
+        }
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // MARK: - Additional Func
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == kSegueFromChatToVideo {
+            if let destinantionController = segue.destination as? VideoFromMessageAVViewController {
+                
+                destinantionController.messageToPlay = [messageArray[numberOfRow].1]
+            }
+        }
+        if segue.identifier == kSegueFromChatToDetailedPhoto {
+            if let destinantionController = segue.destination as? DetailedPhotoViewController {
+                
+                destinantionController.messageRecieved = [(messageArray[numberOfRow].0,messageArray[numberOfRow].1)]
             }
         }
     }

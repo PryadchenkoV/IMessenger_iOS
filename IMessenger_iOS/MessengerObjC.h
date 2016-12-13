@@ -18,6 +18,9 @@ extern NSString* kNSNotificationOnMessageReceived;
 @property(nonatomic,strong)NSString* userId;
 @property(nonatomic,strong)NSString* password;
 
++(id)sharedManager;
+
+
 -(void)loginWithUserId:(UserId)userId password:(NSString*)password completionBlock:(void(^)(operationResult))completionBlock;
 -(void)disconnectFromServer;
 -(void)requestActiveUsersWithEndBlock:(void(^)(operationResult,NSMutableArray*))completionBlock;
