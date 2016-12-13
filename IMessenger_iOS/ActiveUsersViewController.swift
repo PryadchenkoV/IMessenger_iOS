@@ -19,6 +19,7 @@ class ActiveUsersViewController: UIViewController, UITableViewDelegate, UITableV
     
     @IBOutlet weak var barButtonDisconnect: UIBarButtonItem!
     
+    
     @IBOutlet weak var lableUserID: UILabel!
     @IBOutlet weak var barButtonRefresh: UIBarButtonItem!
     var userName = ""

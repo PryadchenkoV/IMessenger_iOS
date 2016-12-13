@@ -7,10 +7,15 @@
 //
 
 import UIKit
+import AVKit
+import AVFoundation
+import MobileCoreServices
 
 let kChatCellReuseableID = "chatTableViewCell"
 let kImageCellReuseableID = "cellForImage"
-
+let kVideoCellReuseableID = "cellWithVideo"
+let kSegueFromChatToVideo = "fromChatToVideo"
+let kSegueFromChatToDetailedPhoto = "fromChatToDetailedPhoto"
 
 
 class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -27,12 +32,14 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     // MARK: - Var and let
     
 
+    var urlVideo:URL?
     var messageFullArray = [(String,Message)]()
     var messageArray = [(String,Message,String)]()
     
     
     var keyboardHeight = CGFloat(0)
     var nameOfUser = ""
+    var numberOfRow = 0
     
     let imageSentMail = UIImage(named: "send100")
     let imageReadMail = UIImage(named: "read100")
@@ -133,6 +140,28 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
                 messengerInstance.sentMessageSeen(withId: self.messageArray[indexPath.row].1.identifier, fromUser: self.title)
             }
         }
+        if messageArray[indexPath.row].1.content.type == Video {
+            numberOfRow = indexPath.row
+            performSegue(withIdentifier: kSegueFromChatToVideo, sender: self)
+        } else if messageArray[indexPath.row].1.content.type == Image {
+            numberOfRow = indexPath.row
+            performSegue(withIdentifier: kSegueFromChatToDetailedPhoto, sender: self)
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == kSegueFromChatToVideo {
+            if let destinantionController = segue.destination as? VideoFromMessageAVViewController {
+
+                destinantionController.messageToPlay = [messageArray[numberOfRow].1]
+            }
+        }
+        if segue.identifier == kSegueFromChatToDetailedPhoto {
+            if let destinantionController = segue.destination as? DetailedPhotoViewController {
+                
+                destinantionController.messageRecieved = [(messageArray[numberOfRow].0,messageArray[numberOfRow].1)]
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -145,22 +174,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             if (messageArray[indexPath.row].0 == loginUserID){
                 cell.lableFromWhomMessenge.text = "To:"
                 cell.backgroundColor = UIColor.white
-                switch(messageArray[indexPath.row].2) {
-                case "Sending":
-                    cell.imageViewStatus.image = imageSendingMail
-                case "Sent":
-                    cell.imageViewStatus.image = imageSentMail
-                case "FailedToSend":
-                    cell.imageViewStatus.image = imageFailedMail
-                case "Delivered":
-                    cell.imageViewStatus.image = imageDeliveredMail
-                case "Seen":
-                    cell.imageViewStatus.image = imageReadMail
-                case "None":
-                    cell.imageViewStatus.image = nil
-                default:
-                    break
-                }
+                cell.imageViewStatus.image = switchForStatus(statusString: messageArray[indexPath.row].2)
             } else if (messageArray[indexPath.row].0 == nameOfUser) {
                 cell.lableFromWhomMessenge.text = "From:"
                 cell.imageViewStatus.image = nil
@@ -168,27 +182,12 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             }
             cell.chatLable.text = messageArray[indexPath.row].1.content.data
             return cell
-        } else {
+        } else if messageArray[indexPath.row].1.content.type == Image {
             let cell = tableView.dequeueReusableCell(withIdentifier: kImageCellReuseableID, for: indexPath) as! ImageTableViewCell
             if (messageArray[indexPath.row].0 == loginUserID){
                 cell.lableFromWhomMessenge.text = "To:"
                 cell.backgroundColor = UIColor.white
-                switch(messageArray[indexPath.row].2) {
-                case "Sending":
-                    cell.imageViewStatus.image = imageSendingMail
-                case "Sent":
-                    cell.imageViewStatus.image = imageSentMail
-                case "FailedToSend":
-                    cell.imageViewStatus.image = imageFailedMail
-                case "Delivered":
-                    cell.imageViewStatus.image = imageDeliveredMail
-                case "Seen":
-                    cell.imageViewStatus.image = imageReadMail
-                case "None":
-                    cell.imageViewStatus.image = nil
-                default:
-                    break
-                }
+                cell.imageViewStatus.image = switchForStatus(statusString: messageArray[indexPath.row].2)
             } else if (messageArray[indexPath.row].0 == nameOfUser) {
                 cell.lableFromWhomMessenge.text = "From:"
                 cell.imageViewStatus.image = nil
@@ -196,10 +195,25 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             }
             let data = Data(base64Encoded: messageArray[indexPath.row].1.content.data, options: NSData.Base64DecodingOptions.ignoreUnknownCharacters);
             let someImage = UIImage(data: data!);
-            cell.imageViewTransferedPic.image = someImage
+            
+            let orientedImage = UIImage(cgImage: (someImage?.cgImage!)!, scale: 1, orientation: (someImage?.imageOrientation)!)
+            cell.imageViewTransferedPic.image = orientedImage
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: kVideoCellReuseableID, for: indexPath) as! VideoTableViewCell
+            if (messageArray[indexPath.row].0 == loginUserID){
+                cell.lableFromWhomMessenge.text = "To:"
+                cell.backgroundColor = UIColor.white
+                cell.imageViewStatus.image = switchForStatus(statusString: messageArray[indexPath.row].2)
+            } else if (messageArray[indexPath.row].0 == nameOfUser) {
+                cell.lableFromWhomMessenge.text = "From:"
+                cell.imageViewStatus.image = nil
+                cell.backgroundColor = UIColor.init(red: 0.745, green: 0.929, blue: 1.0, alpha: 0.4)
+            }
             return cell
         }
     }
+    
     
     // MARK: - IBActions
     
@@ -230,70 +244,97 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
 //        
         let alertController = UIAlertController(title: nil, message: "What content do you want to add?", preferredStyle: .actionSheet)
         
-        let cameraAction = UIAlertAction(title: "Camera", style: .default) { (action) in
+        let cameraAction = UIAlertAction(title: "Photo", style: .default) { (action) in
             if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera) {
                 let imagePicker = UIImagePickerController()
                 imagePicker.delegate = self
                 imagePicker.sourceType = UIImagePickerControllerSourceType.camera;
-                imagePicker.allowsEditing = true
+                imagePicker.allowsEditing = false
                 self.present(imagePicker, animated: true, completion: nil)
             }
         }
         alertController.addAction(cameraAction)
+        let videoAction = UIAlertAction(title: "Video", style: .default) { (action) in
+            if (UIImagePickerController.isSourceTypeAvailable(.camera)) {
+                let imagePicker = UIImagePickerController()
+                imagePicker.sourceType = .camera
+                imagePicker.mediaTypes = [kUTTypeMovie as String]
+                imagePicker.allowsEditing = false
+                imagePicker.delegate = self
+                self.present(imagePicker, animated: true, completion: nil)
+            }
+        }
+        alertController.addAction(videoAction)
         let libraryAction = UIAlertAction(title: "Library", style: .default) { (action) in
             if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.photoLibrary) {
             let imagePicker = UIImagePickerController()
             imagePicker.delegate = self
             imagePicker.sourceType = UIImagePickerControllerSourceType.photoLibrary;
-            imagePicker.allowsEditing = true
+            imagePicker.allowsEditing = false 
             self.present(imagePicker, animated: true, completion: nil)
             }
         }
         alertController.addAction(libraryAction)
+        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive){ (action) in
+        }
+        alertController.addAction(cancelAction)
         self.present(alertController, animated: true) {
         }
 
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        let chosenImage = info[UIImagePickerControllerOriginalImage] as! UIImage 
-        let dataToSave = UIImagePNGRepresentation(chosenImage)
-        let dataToSaveString = String(data: dataToSave!, encoding: String.Encoding.utf8)
-        let strBase64 = dataToSave?.base64EncodedString()
-        let messageContentInstance = MessageContentObjC()
-        messageContentInstance?.encrypted = false
-        messageContentInstance?.type = Image
-        messageContentInstance?.data = strBase64
-        
-        let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
-        self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
-        self.tableViewChat.beginUpdates()
-        self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
-        if self.messageArray.count > 1{
-            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+        if let chosenImage = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            let dataToSave = UIImagePNGRepresentation(chosenImage)
+            //let strBase64 = String(describing: dataToSave)
+            let strBase64 = dataToSave?.base64EncodedString()
+            let messageContentInstance = MessageContentObjC()
+            messageContentInstance?.encrypted = false
+            messageContentInstance?.type = Image
+            messageContentInstance?.data = strBase64
+            
+            let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+            self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
+            self.tableViewChat.beginUpdates()
+            self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+            if self.messageArray.count > 1{
+                self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+            }
+            self.tableViewChat.endUpdates()
+        } else {
+            if let pickedVideo = (info[UIImagePickerControllerMediaURL] as? URL) {
+                urlVideo = pickedVideo
+                let messageContentInstance = MessageContentObjC()
+//                do {
+//                    let strBase64 = try String(contentsOf: pickedVideo)
+//                    let video = try Data(contentsOf: pickedVideo, options: Data.ReadingOptions())
+//                    let strBase64 = video.base64EncodedString()
+//                    messageContentInstance?.encrypted = false
+//                    messageContentInstance?.type = Video
+//                    messageContentInstance?.data = strBase64
+//                } catch {
+//                    print(error)
+//                }
+//                
+                let videoData = NSData(contentsOf: pickedVideo)
+                //let strNew = String(videoData)
+                let strBase64 = videoData?.base64EncodedData(options: NSData.Base64EncodingOptions.lineLength64Characters).base64EncodedString()
+                messageContentInstance?.encrypted = false
+                messageContentInstance?.type = Video
+                messageContentInstance?.data = strBase64
+                let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
+                self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
+                self.tableViewChat.beginUpdates()
+                self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
+                if self.messageArray.count > 1{
+                    self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
+                }
+                self.tableViewChat.endUpdates()
+                self.tableViewChat.reloadData()
+                
+            }
         }
-        self.tableViewChat.endUpdates()
         dismiss(animated: true, completion: nil)
-    }
-
-    
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
-        let dataToSave = UIImagePNGRepresentation(image)
-        let dataToSaveString = String(data: dataToSave!, encoding: String.Encoding.utf8)
-        let messageContentInstance = MessageContentObjC()
-        messageContentInstance?.encrypted = false
-        messageContentInstance?.type = Image
-        messageContentInstance?.data = dataToSaveString
-
-        let messengeSend = messengerInstance.sendMessage(toUser: self.nameOfUser, messageContent: messageContentInstance)
-        self.messageArray = [(loginUserID, messengeSend!, "None")] + self.messageArray
-        self.tableViewChat.beginUpdates()
-        self.tableViewChat.insertRows(at: [IndexPath.init(row: 0, section: 0)], with: .left)
-        if self.messageArray.count > 1{
-            self.tableViewChat.scrollToRow(at: IndexPath.init(row: 0, section: 0), at: .bottom, animated: true)
-        }
-        self.tableViewChat.endUpdates()
-        self.dismiss(animated: true, completion: nil);
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -323,7 +364,7 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
     @IBAction func barButtonPushed(_ sender: UIBarButtonItem) {
         if sender == barButtonClearHistory {
             
-            let alertController = UIAlertController(title: nil, message: "Are you such to clear the history?", preferredStyle: .actionSheet)
+            let alertController = UIAlertController(title: nil, message: "Are you sure to clear the history?", preferredStyle: .actionSheet)
             
             let OKAction = UIAlertAction(title: "Yes", style: .default) { (action) in
                 DispatchQueue.main.async {
@@ -339,6 +380,27 @@ class ChatViewController: UIViewController,UITableViewDelegate, UITableViewDataS
             self.present(alertController, animated: true) {
             }
         }
+    }
+    
+    func switchForStatus(statusString: String) -> UIImage? {
+        var bufImage: UIImage?
+        switch(statusString) {
+        case "Sending":
+            bufImage = imageSendingMail
+        case "Sent":
+            bufImage = imageSentMail
+        case "FailedToSend":
+            bufImage = imageFailedMail
+        case "Delivered":
+            bufImage = imageDeliveredMail
+        case "Seen":
+            bufImage = imageReadMail
+        case "None":
+            bufImage = nil
+        default:
+            break
+        }
+        return bufImage
     }
 
 }
